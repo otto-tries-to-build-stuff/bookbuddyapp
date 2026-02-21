@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import bookmindLogo from "@/assets/bookmind-logo.png";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, BookOpen, Loader2, Save, PenLine } from "lucide-react";
@@ -64,7 +65,7 @@ const BookDetail = () => {
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4 text-accent" />
+            <img src={bookmindLogo} alt="BookMind" className="h-5 w-5" />
             <span className="text-sm text-muted-foreground">BookMind</span>
           </div>
         </div>
