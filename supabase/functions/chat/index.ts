@@ -19,13 +19,13 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { data: books } = await supabase.from("books").select("title, author, summary, key_learnings");
+    const { data: books } = await supabase.from("books").select("id, title, author, summary, key_learnings");
 
     const bookContext = books?.length
       ? books
           .map(
             (b) =>
-              `📖 "${b.title}" by ${b.author}\nSummary: ${b.summary}\nKey Learnings: ${
+              `📖 [ID: ${b.id}] "${b.title}" by ${b.author}\nSummary: ${b.summary}\nKey Learnings: ${
                 Array.isArray(b.key_learnings) ? b.key_learnings.join("; ") : ""
               }`
           )
@@ -43,7 +43,10 @@ Guidelines:
 - Help users recall key concepts, compare ideas across books, and deepen understanding
 - If asked about a book not in the library, let them know and offer general knowledge
 - Be concise but thorough
-- Use markdown formatting for readability`;
+- Use markdown formatting for readability
+- **IMPORTANT**: When referencing information from a specific book, ALWAYS include a reference at the end of the relevant paragraph or section using this exact format: [📖 Book Title](/books/BOOK_ID). For example: [📖 Atomic Habits](/books/abc-123-def)
+- If your answer draws from multiple books, cite each one where its ideas are mentioned
+- When listing key learnings or concepts, attribute each to its source book with the link format above`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
