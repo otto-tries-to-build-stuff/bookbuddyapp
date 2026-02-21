@@ -216,7 +216,7 @@ function ChatItem({
         />
       ) : (
         <span className="min-w-0 flex-1 truncate">
-          {chat.title.length > 24 ? chat.title.slice(0, 24) + "…" : chat.title}
+          {chat.title.length > 20 ? chat.title.slice(0, 20) + "…" : chat.title}
         </span>
       )}
 
