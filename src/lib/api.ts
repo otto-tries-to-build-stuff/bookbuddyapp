@@ -90,6 +90,7 @@ export interface Chat {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+  pinned_at: string | null;
 }
 
 export interface ChatMessage {
@@ -107,17 +108,17 @@ export async function fetchChats(): Promise<Chat[]> {
     .is("deleted_at", null)
     .order("updated_at", { ascending: false });
   if (error) throw error;
-  return data || [];
+  return ((data || []) as any[]).map((c) => ({ ...c, pinned_at: c.pinned_at ?? null }));
 }
 
-export async function fetchTrashedChats(): Promise<Chat[]> {
+export async function fetchArchivedChats(): Promise<Chat[]> {
   const { data, error } = await supabase
     .from("chats")
     .select("*")
     .not("deleted_at", "is", null)
     .order("deleted_at", { ascending: false });
   if (error) throw error;
-  return data || [];
+  return ((data || []) as any[]).map((c) => ({ ...c, pinned_at: c.pinned_at ?? null }));
 }
 
 export async function createChat(title?: string): Promise<Chat> {
@@ -135,7 +136,7 @@ export async function updateChatTitle(id: string, title: string): Promise<void> 
   if (error) throw error;
 }
 
-export async function softDeleteChat(id: string): Promise<void> {
+export async function archiveChat(id: string): Promise<void> {
   const { error } = await supabase
     .from("chats")
     .update({ deleted_at: new Date().toISOString() })
@@ -147,6 +148,22 @@ export async function restoreChat(id: string): Promise<void> {
   const { error } = await supabase
     .from("chats")
     .update({ deleted_at: null })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function pinChat(id: string): Promise<void> {
+  const { error } = await supabase
+    .from("chats")
+    .update({ pinned_at: new Date().toISOString() } as any)
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function unpinChat(id: string): Promise<void> {
+  const { error } = await supabase
+    .from("chats")
+    .update({ pinned_at: null } as any)
     .eq("id", id);
   if (error) throw error;
 }
