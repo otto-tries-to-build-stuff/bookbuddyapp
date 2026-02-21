@@ -215,7 +215,9 @@ function ChatItem({
           autoFocus
         />
       ) : (
-        <span className="min-w-0 flex-1 truncate">{chat.title}</span>
+        <span className="min-w-0 flex-1 truncate">
+          {chat.title.length > 28 ? chat.title.slice(0, 28) + "…" : chat.title}
+        </span>
       )}
 
       <DropdownMenu>
