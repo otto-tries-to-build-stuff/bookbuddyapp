@@ -67,7 +67,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Top bar */}
       <header className="px-4 py-3 sm:px-6">
-        <div className="mx-auto flex max-w-lg items-center justify-between">
+        <div className="mx-auto flex max-w-lg md:max-w-3xl lg:max-w-5xl items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <img alt="BookMind" className="h-6 w-6" src="/lovable-uploads/d4eea19e-ecff-4fd0-bb36-63131f40c4f8.png" />
             <span className="text-sm font-medium text-foreground">BookBuddy</span>
@@ -139,7 +139,7 @@ const Index = () => {
       </header>
 
       {/* Greeting */}
-      <main className="mx-auto max-w-lg px-4 pb-10 sm:px-6">
+      <main className="mx-auto max-w-lg md:max-w-3xl lg:max-w-5xl px-4 pb-10 sm:px-6">
         <div className="mb-6 mt-4">
           <h1 className="text-3xl sm:text-4xl">What are you reading?</h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -158,7 +158,7 @@ const Index = () => {
             <p className="text-sm text-muted-foreground/70">Add your first book to get started</p>
           </div> :
 
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
             {books.map((book) =>
           <BookCard key={book.id} book={book} onDelete={() => deleteMutation.mutate(book.id)} />
           )}
