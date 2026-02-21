@@ -75,10 +75,12 @@ type Msg = { role: "user" | "assistant"; content: string };
 
 export async function streamChat({
   messages,
+  bookIds,
   onDelta,
   onDone,
 }: {
   messages: Msg[];
+  bookIds?: string[];
   onDelta: (text: string) => void;
   onDone: () => void;
 }) {
@@ -90,7 +92,7 @@ export async function streamChat({
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages }),
+      body: JSON.stringify({ messages, bookIds }),
     }
   );
 
