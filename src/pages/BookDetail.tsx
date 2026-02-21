@@ -1,12 +1,17 @@
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, BookOpen, Loader2 } from "lucide-react";
-import { fetchBooks } from "@/lib/api";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, BookOpen, Loader2, Save, PenLine } from "lucide-react";
+import { fetchBooks, updateBookNotes } from "@/lib/api";
 import { getCoverUrl } from "@/lib/openLibrary";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: books = [], isLoading } = useQuery({
     queryKey: ["books"],
@@ -14,6 +19,23 @@ const BookDetail = () => {
   });
 
   const book = books.find((b) => b.id === id);
+
+  const [notes, setNotes] = useState(book?.notes ?? "");
+  const [editing, setEditing] = useState(false);
+
+  useEffect(() => {
+    if (book) setNotes(book.notes ?? "");
+  }, [book]);
+
+  const notesMutation = useMutation({
+    mutationFn: () => updateBookNotes(id!, notes),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["books"] });
+      setEditing(false);
+      toast({ title: "Notes saved" });
+    },
+    onError: (e) => toast({ title: "Error saving notes", description: e.message, variant: "destructive" }),
+  });
 
   if (isLoading) {
     return (
@@ -107,6 +129,54 @@ const BookDetail = () => {
                 </Accordion>
               </section>
             )}
+
+            {/* Personal Notes */}
+            <section className="mt-12">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-2xl">
+                  <PenLine className="h-5 w-5 text-accent" />
+                  My Notes
+                </h2>
+                {!editing && (
+                  <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
+                    Edit
+                  </Button>
+                )}
+              </div>
+              {editing ? (
+                <div className="space-y-3">
+                  <Textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Write your personal notes, reflections, and key takeaways here…"
+                    className="min-h-[160px] resize-y"
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => notesMutation.mutate()}
+                      disabled={notesMutation.isPending}
+                      className="gap-1.5"
+                    >
+                      {notesMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                      Save
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => { setNotes(book.notes ?? ""); setEditing(false); }}>
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : notes ? (
+                <p className="whitespace-pre-line leading-relaxed text-muted-foreground">{notes}</p>
+              ) : (
+                <button
+                  onClick={() => setEditing(true)}
+                  className="w-full rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground/70 transition-colors hover:border-accent/50 hover:text-muted-foreground"
+                >
+                  Click to add your personal notes…
+                </button>
+              )}
+            </section>
           </>
         ) : (
           <div className="flex items-center gap-3 text-muted-foreground">
