@@ -211,6 +211,48 @@ export async function generateChatTitle(message: string): Promise<string> {
   return data?.title || message.slice(0, 40);
 }
 
+// ── Profile ──
+
+export interface Profile {
+  id: string;
+  name: string | null;
+  avatar_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function fetchProfile(): Promise<Profile> {
+  const { data, error } = await supabase
+    .from("profile")
+    .select("*")
+    .limit(1)
+    .single();
+  if (error) throw error;
+  return data as Profile;
+}
+
+export async function updateProfile(
+  id: string,
+  updates: { name?: string; avatar_url?: string }
+): Promise<void> {
+  const { error } = await supabase
+    .from("profile")
+    .update(updates)
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function uploadAvatar(file: File): Promise<string> {
+  const ext = file.name.split(".").pop() || "png";
+  const path = `avatar-${Date.now()}.${ext}`;
+  const { error } = await supabase.storage
+    .from("avatars")
+    .upload(path, file, { upsert: true });
+  if (error) throw error;
+  const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+  return data.publicUrl;
+}
+
 type Msg = { role: "user" | "assistant"; content: string };
 
 export async function streamChat({

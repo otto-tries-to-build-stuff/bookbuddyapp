@@ -2,7 +2,7 @@ import { useState } from "react";
 import bookmindLogo from "@/assets/bookmind-logo.png";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { Plus, BookOpen, MessageCircle, Trash2, Loader2, Menu } from "lucide-react";
+import { Plus, BookOpen, MessageCircle, Trash2, Loader2, User } from "lucide-react";
 import { BookSearchInput } from "@/components/BookSearchInput";
 import type { OpenLibraryBook } from "@/lib/openLibrary";
 import { getCoverUrl } from "@/lib/openLibrary";
@@ -73,6 +73,11 @@ const Index = () => {
             <span className="text-sm font-medium text-foreground">BookMind</span>
           </Link>
           <div className="flex items-center gap-1">
+            <Link to="/profile">
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <User className="h-4 w-4" />
+              </Button>
+            </Link>
             <Link to="/chat">
               <Button variant="ghost" size="icon" className="h-9 w-9">
                 <MessageCircle className="h-4 w-4" />
