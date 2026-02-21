@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { Plus, BookOpen, MessageCircle, Trash2, Loader2 } from "lucide-react";
+import { BookSearchInput } from "@/components/BookSearchInput";
+import type { OpenLibraryBook } from "@/lib/openLibrary";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -94,11 +96,13 @@ const Index = () => {
                 >
                   <div className="space-y-2">
                     <Label htmlFor="title">Title</Label>
-                    <Input
-                      id="title"
-                      placeholder="e.g. Atomic Habits"
+                    <BookSearchInput
                       value={title}
-                      onChange={(e) => setTitle(e.target.value)}
+                      onChange={setTitle}
+                      onSelect={(book: OpenLibraryBook) => {
+                        setTitle(book.title);
+                        setAuthor(book.author);
+                      }}
                     />
                   </div>
                   <div className="space-y-2">
