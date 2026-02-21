@@ -1,24 +1,47 @@
 
-### Overview
-I will implement an autocomplete search feature for the "Add Book" dialog. As you type a book title, the app will fetch suggestions from the Open Library API. Selecting a suggestion will automatically fill in both the Title and Author fields, ensuring accuracy and saving you time.
 
-### User Experience
-*   When you open the "Add Book" dialog, the "Title" field will now act as a search box.
-*   As you type, a dropdown list of matching books (with their authors and covers) will appear.
-*   Selecting a book from the list will instantly populate the Title and Author inputs.
-*   You can still type manually if the book isn't found in the database.
+## Visual Makeover - Modern Mobile-Friendly UX
 
-### Technical Steps
-1.  **API Integration**: Add a new function in `src/lib/api.ts` called `searchBooks(query: string)` that calls the Open Library Search API (`https://openlibrary.org/search.json?q=...`).
-2.  **Search Logic**:
-    *   Implement a debounce in `src/pages/Index.tsx` so we don't spam the API on every single keystroke.
-    *   Add state to manage search results and a "searching" loading indicator.
-3.  **UI Components**:
-    *   Use the existing `Command` and `Popover` components (or a similar dropdown pattern) to display the search results under the Title input.
-    *   Update the `addMutation` to use the selected book data.
-4.  **Refinement**: Ensure that if a user just wants to type a custom title and press Enter, it still works as it does now (manual entry fallback).
+### What's Changing
 
-### Impact
-*   **Accuracy**: Eliminates typos in titles and authors.
-*   **Speed**: Faster than typing everything manually.
-*   **Reliability**: Since the API is free and doesn't require keys, there's no risk of it "shutting off" due to cost.
+Inspired by the reference image, I'll restyle the app to feel more like a polished mobile reading app: clean whitespace, horizontal book list items with cover thumbnails, softer card styling, and a friendlier greeting-style header.
+
+### Approach to Minimise Risk
+
+I'll keep all existing logic, state management, and data flows completely untouched. The changes are purely CSS/layout adjustments within the same components -- no new routes, no API changes, no database changes.
+
+**Pages affected:**
+1. **Index.tsx** -- Header + book list layout
+2. **BookDetail.tsx** -- Detail page polish
+3. **index.css** -- Minor global tweaks
+
+**Pages NOT touched:** Chat, API layer, edge functions, database.
+
+### Detailed Changes
+
+**1. Index page (Home / Library)**
+- Replace the grid of vertical cards with a horizontal list layout (cover thumbnail on the left, title + author + summary snippet on the right) matching the reference style
+- Simplify the header: smaller top bar with hamburger-style icon and a friendly greeting line ("What are you reading?")
+- Add subtle rounded corners and soft shadows to list items
+- Improve mobile padding and spacing
+- Keep the Add Book dialog and delete functionality exactly as-is
+
+**2. BookDetail page**
+- Give the cover image more prominence with a larger, centered display and rounded corners with shadow
+- Add more breathing room between sections
+- Improve mobile padding so content doesn't feel cramped on small screens
+- All existing sections (Summary, Key Takeaways, Chapters, My Notes) remain identical in functionality
+
+**3. Global CSS (index.css)**
+- Slightly soften the background warmth to match the reference's near-white tone
+- Add a subtle transition for interactive elements
+
+### What Stays the Same
+- All data fetching, mutations, and React Query logic
+- The Add Book dialog with autocomplete search
+- The delete confirmation flow
+- The Chat page (untouched)
+- The notes editing feature
+- All database tables and edge functions
+- All routing
+
