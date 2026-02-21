@@ -71,6 +71,100 @@ export async function deleteBook(id: string): Promise<void> {
   if (error) throw error;
 }
 
+// ── Chat history ──
+
+export interface Chat {
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+export interface ChatMessage {
+  id: string;
+  chat_id: string;
+  role: "user" | "assistant";
+  content: string;
+  created_at: string;
+}
+
+export async function fetchChats(): Promise<Chat[]> {
+  const { data, error } = await supabase
+    .from("chats")
+    .select("*")
+    .is("deleted_at", null)
+    .order("updated_at", { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function fetchTrashedChats(): Promise<Chat[]> {
+  const { data, error } = await supabase
+    .from("chats")
+    .select("*")
+    .not("deleted_at", "is", null)
+    .order("deleted_at", { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createChat(title?: string): Promise<Chat> {
+  const { data, error } = await supabase
+    .from("chats")
+    .insert({ title: title || "New Chat" })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateChatTitle(id: string, title: string): Promise<void> {
+  const { error } = await supabase.from("chats").update({ title }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function softDeleteChat(id: string): Promise<void> {
+  const { error } = await supabase
+    .from("chats")
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function restoreChat(id: string): Promise<void> {
+  const { error } = await supabase
+    .from("chats")
+    .update({ deleted_at: null })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function permanentlyDeleteChat(id: string): Promise<void> {
+  const { error } = await supabase.from("chats").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function fetchChatMessages(chatId: string): Promise<ChatMessage[]> {
+  const { data, error } = await supabase
+    .from("chat_messages")
+    .select("*")
+    .eq("chat_id", chatId)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return (data || []) as ChatMessage[];
+}
+
+export async function saveChatMessage(chatId: string, role: "user" | "assistant", content: string): Promise<ChatMessage> {
+  const { data, error } = await supabase
+    .from("chat_messages")
+    .insert({ chat_id: chatId, role, content })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as ChatMessage;
+}
+
 type Msg = { role: "user" | "assistant"; content: string };
 
 export async function streamChat({
