@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, BookOpen, Send, Loader2, Check } from "lucide-react";
+import { ArrowLeft, BookOpen, Send, Loader2, Check, Menu } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -137,21 +139,52 @@ const Chat = () => {
   };
 
   const hasStartedChat = messages.length > 0;
+  const isMobile = useIsMobile();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleSelectChatMobile = useCallback((chatId: string) => {
+    handleSelectChat(chatId);
+    setSidebarOpen(false);
+  }, [handleSelectChat]);
+
+  const handleNewChatMobile = useCallback(() => {
+    handleNewChat();
+    setSidebarOpen(false);
+  }, [handleNewChat]);
+
+  const sidebarContent = (
+    <ChatSidebar
+      activeChatId={activeChatId}
+      onSelectChat={isMobile ? handleSelectChatMobile : handleSelectChat}
+      onNewChat={isMobile ? handleNewChatMobile : handleNewChat}
+    />
+  );
 
   return (
     <div className="flex h-screen bg-background">
-      {/* Sidebar */}
-      <ChatSidebar
-        activeChatId={activeChatId}
-        onSelectChat={handleSelectChat}
-        onNewChat={handleNewChat}
-      />
+      {/* Desktop sidebar */}
+      {!isMobile && sidebarContent}
+
+      {/* Mobile sidebar sheet */}
+      {isMobile && (
+        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetContent side="left" className="w-72 p-0">
+            <SheetTitle className="sr-only">Chat history</SheetTitle>
+            {sidebarContent}
+          </SheetContent>
+        </Sheet>
+      )}
 
       {/* Main chat area */}
       <div className="flex flex-1 flex-col">
         {/* Header */}
         <header className="shrink-0 border-b border-border">
-          <div className="mx-auto flex max-w-3xl items-center gap-4 px-6 py-4">
+          <div className="mx-auto flex max-w-3xl items-center gap-4 px-4 py-4 sm:px-6">
+            {isMobile && (
+              <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0" onClick={() => setSidebarOpen(true)}>
+                <Menu className="h-5 w-5" />
+              </Button>
+            )}
             <Link to="/" className="rounded-md p-1.5 text-muted-foreground hover:bg-secondary">
               <ArrowLeft className="h-5 w-5" />
             </Link>

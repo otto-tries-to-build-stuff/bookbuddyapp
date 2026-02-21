@@ -70,7 +70,7 @@ const ProfilePage = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="px-4 py-3 sm:px-6">
-        <div className="mx-auto flex max-w-lg items-center gap-3">
+        <div className="mx-auto flex max-w-lg md:max-w-2xl items-center gap-3">
           <Link
             to="/"
             className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary"
@@ -84,7 +84,7 @@ const ProfilePage = () => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-lg px-4 pb-16 pt-8 sm:px-6">
+      <main className="mx-auto max-w-lg md:max-w-2xl px-4 pb-16 pt-8 sm:px-6">
         <h1 className="mb-8 text-3xl">Profile</h1>
 
         {/* Avatar */}

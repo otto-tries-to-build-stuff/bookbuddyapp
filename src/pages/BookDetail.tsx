@@ -60,7 +60,7 @@ const BookDetail = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="px-4 py-3 sm:px-6">
-        <div className="mx-auto flex max-w-lg items-center gap-3">
+        <div className="mx-auto flex max-w-lg md:max-w-3xl lg:max-w-4xl items-center gap-3">
           <Link to="/" className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary">
             <ArrowLeft className="h-5 w-5" />
           </Link>
@@ -71,24 +71,26 @@ const BookDetail = () => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-lg px-4 pb-16 pt-4 sm:px-6">
-        {/* Cover */}
-        {(() => {
-          const coverUrl = getCoverUrl(book.cover_id, "L");
-          return coverUrl ? (
-            <div className="mb-8 flex justify-center">
-              <img
-                src={coverUrl}
-                alt={`Cover of ${book.title}`}
-                className="h-72 rounded-2xl object-contain shadow-lg"
-              />
-            </div>
-          ) : null;
-        })()}
-
-        {/* Title & Author */}
-        <h1 className="mb-1 text-3xl leading-tight sm:text-4xl">{book.title}</h1>
-        <p className="mb-10 text-base text-muted-foreground">by {book.author}</p>
+      <main className="mx-auto max-w-lg md:max-w-3xl lg:max-w-4xl px-4 pb-16 pt-4 sm:px-6">
+        {/* Cover + Title: two-column on desktop */}
+        <div className="mb-10 flex flex-col items-center md:flex-row md:items-start md:gap-8">
+          {(() => {
+            const coverUrl = getCoverUrl(book.cover_id, "L");
+            return coverUrl ? (
+              <div className="mb-6 flex shrink-0 justify-center md:mb-0">
+                <img
+                  src={coverUrl}
+                  alt={`Cover of ${book.title}`}
+                  className="h-72 rounded-2xl object-contain shadow-lg"
+                />
+              </div>
+            ) : null;
+          })()}
+          <div>
+            <h1 className="mb-1 text-3xl leading-tight sm:text-4xl">{book.title}</h1>
+            <p className="text-base text-muted-foreground">by {book.author}</p>
+          </div>
+        </div>
 
         {book.summary ? (
           <div className="space-y-10">
