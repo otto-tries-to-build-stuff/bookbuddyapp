@@ -104,7 +104,8 @@
   .prose h2,
   .prose h3,
   .prose h4 {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
     margin-top: 1.5em;
     margin-bottom: 0.5em;
   }
