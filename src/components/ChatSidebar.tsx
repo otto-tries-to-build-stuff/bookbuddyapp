@@ -216,13 +216,13 @@ function ChatItem({
         />
       ) : (
         <span className="min-w-0 flex-1 truncate">
-          {chat.title.length > 28 ? chat.title.slice(0, 28) + "…" : chat.title}
+          {chat.title.length > 24 ? chat.title.slice(0, 24) + "…" : chat.title}
         </span>
       )}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-          <button className="shrink-0 rounded p-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-secondary transition-opacity ml-auto">
+          <button className="shrink-0 rounded p-1 mr-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-secondary transition-opacity ml-auto">
             <MoreHorizontal className="h-4 w-4" />
           </button>
         </DropdownMenuTrigger>
