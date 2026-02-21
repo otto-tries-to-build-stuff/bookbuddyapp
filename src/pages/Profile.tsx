@@ -78,7 +78,7 @@ const ProfilePage = () => {
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="flex items-center gap-2">
-            <img src={bookmindLogo} alt="BookMind" className="h-5 w-5" />
+            
             <span className="text-sm text-muted-foreground">BookBuddy</span>
           </div>
         </div>
