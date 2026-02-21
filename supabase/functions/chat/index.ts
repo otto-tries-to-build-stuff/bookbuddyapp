@@ -44,9 +44,9 @@ Guidelines:
 - If asked about a book not in the library, let them know and offer general knowledge
 - Be concise but thorough
 - Use markdown formatting for readability
-- **IMPORTANT**: When referencing information from a specific book, ALWAYS include a reference at the end of the relevant paragraph or section using this exact format: [📖 Book Title](/books/BOOK_ID). For example: [📖 Atomic Habits](/books/abc-123-def)
-- If your answer draws from multiple books, cite each one where its ideas are mentioned
-- When listing key learnings or concepts, attribute each to its source book with the link format above`;
+- **IMPORTANT**: When referencing information from a book, always mention the specific chapter, section, or part of the book where the concept can be found. For example: "*(Chapter 3: The Four Laws of Behavior Change, Atomic Habits)*"
+- If you're unsure of the exact chapter, provide your best estimate based on the book's typical structure and note it as approximate
+- When listing key learnings or concepts, attribute each to its source book and chapter/section`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
