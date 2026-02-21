@@ -22,6 +22,7 @@ export type Database = {
           created_at: string
           id: string
           key_learnings: Json | null
+          notes: string | null
           summary: string | null
           title: string
           updated_at: string
@@ -33,6 +34,7 @@ export type Database = {
           created_at?: string
           id?: string
           key_learnings?: Json | null
+          notes?: string | null
           summary?: string | null
           title: string
           updated_at?: string
@@ -44,6 +46,7 @@ export type Database = {
           created_at?: string
           id?: string
           key_learnings?: Json | null
+          notes?: string | null
           summary?: string | null
           title?: string
           updated_at?: string

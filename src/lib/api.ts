@@ -14,6 +14,7 @@ export interface Book {
   key_learnings: string[];
   chapters: BookChapter[];
   cover_id: number | null;
+  notes: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -80,6 +81,11 @@ export async function addBook(title: string, author: string, coverId?: number | 
 
 export async function deleteBook(id: string): Promise<void> {
   const { error } = await supabase.from("books").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function updateBookNotes(id: string, notes: string): Promise<void> {
+  const { error } = await supabase.from("books").update({ notes }).eq("id", id);
   if (error) throw error;
 }
 
