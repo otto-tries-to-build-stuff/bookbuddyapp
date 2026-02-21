@@ -1,15 +1,20 @@
 import { useState } from "react";
-import { Plus, Trash2, RotateCcw, MessageSquare, Archive, X, Loader2 } from "lucide-react";
+import { Plus, MoreHorizontal, RotateCcw, MessageSquare, Archive, Trash2, Pin, PinOff, Pencil, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchChats,
-  fetchTrashedChats,
-  softDeleteChat,
+  fetchArchivedChats,
+  archiveChat,
   restoreChat,
   permanentlyDeleteChat,
+  pinChat,
+  unpinChat,
+  updateChatTitle,
   type Chat,
 } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
@@ -20,7 +25,7 @@ interface ChatSidebarProps {
   onNewChat: () => void;
 }
 
-type Tab = "history" | "trash";
+type Tab = "history" | "archive";
 
 export default function ChatSidebar({ activeChatId, onSelectChat, onNewChat }: ChatSidebarProps) {
   const { toast } = useToast();
@@ -32,43 +37,56 @@ export default function ChatSidebar({ activeChatId, onSelectChat, onNewChat }: C
     queryFn: fetchChats,
   });
 
-  const { data: trashedChats = [], isLoading: trashLoading } = useQuery({
-    queryKey: ["chats-trash"],
-    queryFn: fetchTrashedChats,
+  const { data: archivedChats = [], isLoading: archiveLoading } = useQuery({
+    queryKey: ["chats-archive"],
+    queryFn: fetchArchivedChats,
   });
 
-  const trashMutation = useMutation({
-    mutationFn: softDeleteChat,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["chats"] });
-      queryClient.invalidateQueries({ queryKey: ["chats-trash"] });
-      toast({ title: "Chat moved to bin" });
-    },
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: ["chats"] });
+    queryClient.invalidateQueries({ queryKey: ["chats-archive"] });
+  };
+
+  const archiveMutation = useMutation({
+    mutationFn: archiveChat,
+    onSuccess: () => { invalidateAll(); toast({ title: "Chat archived" }); },
   });
 
   const restoreMutation = useMutation({
     mutationFn: restoreChat,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["chats"] });
-      queryClient.invalidateQueries({ queryKey: ["chats-trash"] });
-      toast({ title: "Chat restored" });
-    },
+    onSuccess: () => { invalidateAll(); toast({ title: "Chat restored" }); },
   });
 
   const deleteMutation = useMutation({
     mutationFn: permanentlyDeleteChat,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["chats-trash"] });
-      toast({ title: "Chat permanently deleted" });
-    },
+    onSuccess: () => { invalidateAll(); toast({ title: "Chat permanently deleted" }); },
   });
 
-  const isLoading = tab === "history" ? chatsLoading : trashLoading;
-  const items = tab === "history" ? chats : trashedChats;
+  const pinMutation = useMutation({
+    mutationFn: ({ id, pinned }: { id: string; pinned: boolean }) =>
+      pinned ? unpinChat(id) : pinChat(id),
+    onSuccess: () => { invalidateAll(); },
+  });
+
+  const renameMutation = useMutation({
+    mutationFn: ({ id, title }: { id: string; title: string }) => updateChatTitle(id, title),
+    onSuccess: () => { invalidateAll(); toast({ title: "Chat renamed" }); },
+  });
+
+  const isLoading = tab === "history" ? chatsLoading : archiveLoading;
+  const items = tab === "history" ? chats : archivedChats;
+
+  // Sort: pinned first, then by updated_at
+  const sortedItems = tab === "history"
+    ? [...items].sort((a, b) => {
+        if (a.pinned_at && !b.pinned_at) return -1;
+        if (!a.pinned_at && b.pinned_at) return 1;
+        return 0; // keep original order within groups
+      })
+    : items;
 
   return (
     <div className="flex h-full w-64 flex-col border-r border-border bg-sidebar-background">
-      {/* New chat button */}
       <div className="shrink-0 p-3">
         <Button onClick={onNewChat} variant="outline" size="sm" className="w-full gap-2">
           <Plus className="h-4 w-4" />
@@ -76,7 +94,6 @@ export default function ChatSidebar({ activeChatId, onSelectChat, onNewChat }: C
         </Button>
       </div>
 
-      {/* Tabs */}
       <div className="flex shrink-0 border-b border-border">
         <button
           onClick={() => setTab("history")}
@@ -91,41 +108,42 @@ export default function ChatSidebar({ activeChatId, onSelectChat, onNewChat }: C
           History
         </button>
         <button
-          onClick={() => setTab("trash")}
+          onClick={() => setTab("archive")}
           className={cn(
             "flex flex-1 items-center justify-center gap-1.5 py-2 text-xs font-medium transition-colors",
-            tab === "trash"
+            tab === "archive"
               ? "border-b-2 border-accent text-accent"
               : "text-muted-foreground hover:text-foreground"
           )}
         >
           <Archive className="h-3.5 w-3.5" />
-          Bin {trashedChats.length > 0 && `(${trashedChats.length})`}
+          Archive {archivedChats.length > 0 && `(${archivedChats.length})`}
         </button>
       </div>
 
-      {/* List */}
       <ScrollArea className="flex-1">
         <div className="p-2 space-y-1">
           {isLoading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             </div>
-          ) : items.length === 0 ? (
+          ) : sortedItems.length === 0 ? (
             <p className="px-3 py-8 text-center text-xs text-muted-foreground">
-              {tab === "history" ? "No chats yet" : "Bin is empty"}
+              {tab === "history" ? "No chats yet" : "Archive is empty"}
             </p>
           ) : (
-            items.map((chat) => (
+            sortedItems.map((chat) => (
               <ChatItem
                 key={chat.id}
                 chat={chat}
                 isActive={chat.id === activeChatId}
                 tab={tab}
                 onSelect={() => tab === "history" && onSelectChat(chat.id)}
-                onTrash={() => trashMutation.mutate(chat.id)}
+                onArchive={() => archiveMutation.mutate(chat.id)}
                 onRestore={() => restoreMutation.mutate(chat.id)}
                 onDelete={() => deleteMutation.mutate(chat.id)}
+                onTogglePin={() => pinMutation.mutate({ id: chat.id, pinned: !!chat.pinned_at })}
+                onRename={(title) => renameMutation.mutate({ id: chat.id, title })}
               />
             ))
           )}
@@ -140,18 +158,33 @@ function ChatItem({
   isActive,
   tab,
   onSelect,
-  onTrash,
+  onArchive,
   onRestore,
   onDelete,
+  onTogglePin,
+  onRename,
 }: {
   chat: Chat;
   isActive: boolean;
   tab: Tab;
   onSelect: () => void;
-  onTrash: () => void;
+  onArchive: () => void;
   onRestore: () => void;
   onDelete: () => void;
+  onTogglePin: () => void;
+  onRename: (title: string) => void;
 }) {
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [renameValue, setRenameValue] = useState(chat.title);
+
+  const handleRenameSubmit = () => {
+    const trimmed = renameValue.trim();
+    if (trimmed && trimmed !== chat.title) {
+      onRename(trimmed);
+    }
+    setIsRenaming(false);
+  };
+
   return (
     <div
       onClick={onSelect}
@@ -161,36 +194,70 @@ function ChatItem({
         isActive ? "bg-accent/10 text-accent" : "text-foreground hover:bg-secondary"
       )}
     >
-      <MessageSquare className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-      <span className="flex-1 truncate">{chat.title}</span>
-      <div className="flex shrink-0 gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        {tab === "history" ? (
-          <button
-            onClick={(e) => { e.stopPropagation(); onTrash(); }}
-            className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-            title="Move to bin"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
+      {chat.pinned_at && tab === "history" && (
+        <Pin className="h-3 w-3 shrink-0 text-accent" />
+      )}
+      {!chat.pinned_at && (
+        <MessageSquare className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+      )}
+
+      {isRenaming ? (
+        <Input
+          value={renameValue}
+          onChange={(e) => setRenameValue(e.target.value)}
+          onBlur={handleRenameSubmit}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleRenameSubmit();
+            if (e.key === "Escape") setIsRenaming(false);
+          }}
+          onClick={(e) => e.stopPropagation()}
+          className="h-6 flex-1 text-xs px-1 py-0"
+          autoFocus
+        />
+      ) : (
+        <span className="flex-1 truncate">{chat.title}</span>
+      )}
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+          <button className="shrink-0 rounded p-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-secondary transition-opacity">
+            <MoreHorizontal className="h-3.5 w-3.5" />
           </button>
-        ) : (
-          <>
-            <button
-              onClick={(e) => { e.stopPropagation(); onRestore(); }}
-              className="rounded p-1 text-muted-foreground hover:bg-accent/10 hover:text-accent"
-              title="Restore"
-            >
-              <RotateCcw className="h-3.5 w-3.5" />
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); onDelete(); }}
-              className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-              title="Delete permanently"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          </>
-        )}
-      </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-40">
+          {tab === "history" ? (
+            <>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onTogglePin(); }}>
+                {chat.pinned_at ? <PinOff className="mr-2 h-3.5 w-3.5" /> : <Pin className="mr-2 h-3.5 w-3.5" />}
+                {chat.pinned_at ? "Unpin" : "Pin"}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setRenameValue(chat.title); setIsRenaming(true); }}>
+                <Pencil className="mr-2 h-3.5 w-3.5" />
+                Rename
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onArchive(); }}>
+                <Archive className="mr-2 h-3.5 w-3.5" />
+                Archive
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDelete(); }} className="text-destructive focus:text-destructive">
+                <Trash2 className="mr-2 h-3.5 w-3.5" />
+                Delete
+              </DropdownMenuItem>
+            </>
+          ) : (
+            <>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onRestore(); }}>
+                <RotateCcw className="mr-2 h-3.5 w-3.5" />
+                Restore
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDelete(); }} className="text-destructive focus:text-destructive">
+                <Trash2 className="mr-2 h-3.5 w-3.5" />
+                Delete permanently
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
