@@ -14,8 +14,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  DialogTrigger } from
+"@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,8 +24,8 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+  AlertDialogTitle } from
+"@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { fetchBooks, addBook, deleteBook, type Book } from "@/lib/api";
 
@@ -39,7 +39,7 @@ const Index = () => {
 
   const { data: books = [], isLoading } = useQuery({
     queryKey: ["books"],
-    queryFn: fetchBooks,
+    queryFn: fetchBooks
   });
 
   const addMutation = useMutation({
@@ -52,7 +52,7 @@ const Index = () => {
       setCoverId(null);
       toast({ title: "Book added!", description: "AI is generating the summary." });
     },
-    onError: (e) => toast({ title: "Error", description: e.message, variant: "destructive" }),
+    onError: (e) => toast({ title: "Error", description: e.message, variant: "destructive" })
   });
 
   const deleteMutation = useMutation({
@@ -60,7 +60,7 @@ const Index = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["books"] });
       toast({ title: "Book removed" });
-    },
+    }
   });
 
   return (
@@ -69,7 +69,7 @@ const Index = () => {
       <header className="px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-lg items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <img src={bookmindLogo} alt="BookMind" className="h-6 w-6" />
+            <img alt="BookMind" className="h-6 w-6" src="/lovable-uploads/52961b25-0993-4a45-88df-fc639126044c.png" />
             <span className="text-sm font-medium text-foreground">BookMind</span>
           </Link>
           <div className="flex items-center gap-1">
@@ -98,8 +98,8 @@ const Index = () => {
                     e.preventDefault();
                     if (title && author) addMutation.mutate();
                   }}
-                  className="space-y-4"
-                >
+                  className="space-y-4">
+
                   <div className="space-y-2">
                     <Label htmlFor="title">Title</Label>
                     <BookSearchInput
@@ -109,8 +109,8 @@ const Index = () => {
                         setTitle(book.title);
                         setAuthor(book.author);
                         setCoverId(book.coverId);
-                      }}
-                    />
+                      }} />
+
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="author">Author</Label>
@@ -118,18 +118,18 @@ const Index = () => {
                       id="author"
                       placeholder="e.g. James Clear"
                       value={author}
-                      onChange={(e) => setAuthor(e.target.value)}
-                    />
+                      onChange={(e) => setAuthor(e.target.value)} />
+
                   </div>
                   <Button type="submit" className="w-full" disabled={addMutation.isPending || !title || !author}>
-                    {addMutation.isPending ? (
-                      <>
+                    {addMutation.isPending ?
+                    <>
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Generating summary…
-                      </>
-                    ) : (
-                      "Add Book"
-                    )}
+                      </> :
+
+                    "Add Book"
+                    }
                   </Button>
                 </form>
               </DialogContent>
@@ -147,29 +147,29 @@ const Index = () => {
           </p>
         </div>
 
-        {isLoading ? (
-          <div className="flex justify-center py-20">
+        {isLoading ?
+        <div className="flex justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : books.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20 text-center">
+          </div> :
+        books.length === 0 ?
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20 text-center">
             <BookOpen className="mb-4 h-12 w-12 text-muted-foreground/50" />
             <p className="text-lg text-muted-foreground">Your library is empty</p>
             <p className="text-sm text-muted-foreground/70">Add your first book to get started</p>
+          </div> :
+
+        <div className="space-y-3">
+            {books.map((book) =>
+          <BookCard key={book.id} book={book} onDelete={() => deleteMutation.mutate(book.id)} />
+          )}
           </div>
-        ) : (
-          <div className="space-y-3">
-            {books.map((book) => (
-              <BookCard key={book.id} book={book} onDelete={() => deleteMutation.mutate(book.id)} />
-            ))}
-          </div>
-        )}
+        }
       </main>
-    </div>
-  );
+    </div>);
+
 };
 
-function BookCard({ book, onDelete }: { book: Book; onDelete: () => void }) {
+function BookCard({ book, onDelete }: {book: Book;onDelete: () => void;}) {
   const [showConfirm, setShowConfirm] = useState(false);
   const coverUrl = getCoverUrl(book.cover_id, "M");
 
@@ -177,22 +177,22 @@ function BookCard({ book, onDelete }: { book: Book; onDelete: () => void }) {
     <>
       <Link
         to={`/book/${book.id}`}
-        className="group relative flex gap-4 rounded-2xl bg-card p-3 shadow-sm transition-all hover:shadow-md active:scale-[0.99]"
-      >
+        className="group relative flex gap-4 rounded-2xl bg-card p-3 shadow-sm transition-all hover:shadow-md active:scale-[0.99]">
+
         {/* Cover thumbnail */}
         <div className="h-24 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
-          {coverUrl ? (
-            <img
-              src={coverUrl}
-              alt={`Cover of ${book.title}`}
-              className="h-full w-full object-cover"
-              loading="lazy"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center">
+          {coverUrl ?
+          <img
+            src={coverUrl}
+            alt={`Cover of ${book.title}`}
+            className="h-full w-full object-cover"
+            loading="lazy" /> :
+
+
+          <div className="flex h-full w-full items-center justify-center">
               <BookOpen className="h-5 w-5 text-muted-foreground/40" />
             </div>
-          )}
+          }
         </div>
 
         {/* Text */}
@@ -213,8 +213,8 @@ function BookCard({ book, onDelete }: { book: Book; onDelete: () => void }) {
             e.stopPropagation();
             setShowConfirm(true);
           }}
-          className="absolute right-2 top-2 rounded-lg p-1.5 text-muted-foreground/40 opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
-        >
+          className="absolute right-2 top-2 rounded-lg p-1.5 text-muted-foreground/40 opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100">
+
           <Trash2 className="h-3.5 w-3.5" />
         </button>
       </Link>
@@ -233,8 +233,8 @@ function BookCard({ book, onDelete }: { book: Book; onDelete: () => void }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
-  );
+    </>);
+
 }
 
 export default Index;
