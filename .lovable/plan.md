@@ -1,44 +1,33 @@
 
 
-# 📚 BookMind – AI-Powered Book Revision App
+# Improve Chat Response Formatting
 
-A clean, minimal learning companion that helps you retain knowledge from books you've read.
+The markdown rendered in chat responses currently uses `prose prose-sm` which makes text small and compact. The fix involves updating the Tailwind prose classes and adding custom CSS to style the markdown output with better spacing, larger headings using the app's serif font, and improved readability.
 
-## Page 1: My Library
+## Changes
 
-- A clean homepage showing your book collection as cards
-- Each card displays the book title, author, and a brief AI-generated summary
-- "Add Book" button opens a simple form where you enter a book title and author
-- AI automatically generates a summary and key learnings for each book
-- Key learnings displayed as bullet points on each book's detail view
-- Ability to remove books from your library
+### 1. Update prose classes in `src/pages/Chat.tsx` (line ~155)
 
-## Page 2: Book Detail View
+Change `prose prose-sm` to `prose prose-base` for larger base text size, and remove `max-w-none` constraints.
 
-- Full AI-generated summary of the book
-- List of key takeaways / learnings
-- Clean, readable typography with plenty of whitespace
+### 2. Add custom markdown styles in `src/index.css`
 
-## Page 3: Chat – Ask About Your Books
+Add targeted styles for the chat prose content:
+- Headings (h1-h4): Use `Instrument Serif` font, increase size, add more vertical margin
+- Paragraphs: Increase line-height and bottom margin for better spacing
+- Bold text: Slightly heavier weight for better visibility
+- Lists: More spacing between items
+- Italicized references (chapter citations): Subtle muted color to distinguish from body text
+- Numbered list items: Better spacing and visual hierarchy
 
-- Conversational chat interface powered by AI
-- The AI has context about all the books in your library
-- Ask open-ended questions like "What did Atomic Habits say about habit stacking?" or "Compare the leadership ideas from two of my books"
-- Streaming responses for a natural chat feel
-- Chat history within the session
+### Technical Details
 
-## Backend (Lovable Cloud)
+The styling will target `.prose` inside the assistant message bubble using standard Tailwind `@apply` directives and regular CSS within the existing `@layer base` block in `index.css`. This keeps all theme customization centralized.
 
-- **Database** to store your book library (titles, authors, summaries, key learnings)
-- **Edge functions** for AI-powered features:
-  - Generate book summaries and key learnings when a book is added
-  - Chat endpoint that includes your library context for relevant answers
-- Uses **Lovable AI** (no API keys needed from you)
-
-## Design
-
-- Clean, minimal aesthetic with a focus on readability
-- Neutral color palette with subtle accents
-- Card-based layout for the library
-- Simple, distraction-free chat interface
+Key CSS additions:
+- `h1, h2, h3, h4` in prose: `font-family: 'Instrument Serif', serif; margin-top: 1.5em; margin-bottom: 0.5em`
+- `h2` size ~1.35rem, `h3` size ~1.15rem for clear hierarchy
+- `p` elements: `margin-bottom: 0.75em; line-height: 1.75`
+- `li` elements: `margin-bottom: 0.4em`
+- `em` (italic references): `color: hsl(var(--muted-foreground))`
 
