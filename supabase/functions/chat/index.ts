@@ -10,16 +10,19 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages } = await req.json();
+    const { messages, bookIds } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Fetch all books for context
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { data: books } = await supabase.from("books").select("id, title, author, summary, key_learnings");
+    let query = supabase.from("books").select("id, title, author, summary, key_learnings");
+    if (Array.isArray(bookIds) && bookIds.length > 0) {
+      query = query.in("id", bookIds);
+    }
+    const { data: books } = await query;
 
     const bookContext = books?.length
       ? books
