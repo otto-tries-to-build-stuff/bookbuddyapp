@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
@@ -93,7 +93,7 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Source Sans 3', sans-serif;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -102,14 +102,14 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Instrument Serif', serif;
+    font-family: 'Libre Baskerville', serif;
   }
 
   .prose h1,
   .prose h2,
   .prose h3,
   .prose h4 {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Source Sans 3', sans-serif;
     font-weight: 600;
     margin-top: 1.5em;
     margin-bottom: 0.5em;
