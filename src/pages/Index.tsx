@@ -13,6 +13,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { fetchBooks, addBook, deleteBook, type Book } from "@/lib/api";
 
@@ -147,29 +157,48 @@ const Index = () => {
 };
 
 function BookCard({ book, onDelete }: { book: Book; onDelete: () => void }) {
+  const [showConfirm, setShowConfirm] = useState(false);
+
   return (
-    <Card className="group relative transition-shadow hover:shadow-md">
-      <Link to={`/book/${book.id}`}>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl leading-tight">{book.title}</CardTitle>
-          <p className="text-sm text-muted-foreground">{book.author}</p>
-        </CardHeader>
-        <CardContent>
-          <p className="line-clamp-3 text-sm text-muted-foreground">
-            {book.summary || "Generating summary…"}
-          </p>
-        </CardContent>
-      </Link>
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          onDelete();
-        }}
-        className="absolute right-3 top-3 rounded-md p-1.5 text-muted-foreground/50 opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
-      >
-        <Trash2 className="h-4 w-4" />
-      </button>
-    </Card>
+    <>
+      <Card className="group relative transition-shadow hover:shadow-md">
+        <Link to={`/book/${book.id}`}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xl leading-tight">{book.title}</CardTitle>
+            <p className="text-sm text-muted-foreground">{book.author}</p>
+          </CardHeader>
+          <CardContent>
+            <p className="line-clamp-3 text-sm text-muted-foreground">
+              {book.summary || "Generating summary…"}
+            </p>
+          </CardContent>
+        </Link>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            setShowConfirm(true);
+          }}
+          className="absolute right-3 top-3 rounded-md p-1.5 text-muted-foreground/50 opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </Card>
+
+      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete "{book.title}"?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove this book and its summary from your library.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
