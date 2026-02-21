@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Plus, BookOpen, MessageCircle, Trash2, Loader2 } from "lucide-react";
 import { BookSearchInput } from "@/components/BookSearchInput";
 import type { OpenLibraryBook } from "@/lib/openLibrary";
+import { getCoverUrl } from "@/lib/openLibrary";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -34,6 +35,7 @@ const Index = () => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
+  const [coverId, setCoverId] = useState<number | null>(null);
 
   const { data: books = [], isLoading } = useQuery({
     queryKey: ["books"],
@@ -41,12 +43,13 @@ const Index = () => {
   });
 
   const addMutation = useMutation({
-    mutationFn: () => addBook(title, author),
+    mutationFn: () => addBook(title, author, coverId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["books"] });
       setOpen(false);
       setTitle("");
       setAuthor("");
+      setCoverId(null);
       toast({ title: "Book added!", description: "AI is generating the summary." });
     },
     onError: (e) => toast({ title: "Error", description: e.message, variant: "destructive" }),
@@ -102,6 +105,7 @@ const Index = () => {
                       onSelect={(book: OpenLibraryBook) => {
                         setTitle(book.title);
                         setAuthor(book.author);
+                        setCoverId(book.coverId);
                       }}
                     />
                   </div>
@@ -163,10 +167,22 @@ const Index = () => {
 function BookCard({ book, onDelete }: { book: Book; onDelete: () => void }) {
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const coverUrl = getCoverUrl(book.cover_id, "M");
+
   return (
     <>
       <Card className="group relative transition-shadow hover:shadow-md">
         <Link to={`/book/${book.id}`}>
+          {coverUrl && (
+            <div className="overflow-hidden rounded-t-lg">
+              <img
+                src={coverUrl}
+                alt={`Cover of ${book.title}`}
+                className="h-48 w-full object-cover"
+                loading="lazy"
+              />
+            </div>
+          )}
           <CardHeader className="pb-2">
             <CardTitle className="text-xl leading-tight">{book.title}</CardTitle>
             <p className="text-sm text-muted-foreground">{book.author}</p>
