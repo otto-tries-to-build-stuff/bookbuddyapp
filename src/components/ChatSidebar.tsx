@@ -189,7 +189,7 @@ function ChatItem({
     <div
       onClick={onSelect}
       className={cn(
-        "group flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors overflow-visible",
+        "group flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
         tab === "history" && "cursor-pointer",
         isActive ? "bg-accent/10 text-accent" : "text-foreground hover:bg-secondary"
       )}
@@ -215,7 +215,7 @@ function ChatItem({
           autoFocus
         />
       ) : (
-        <span className="flex-1 truncate">{chat.title}</span>
+        <span className="min-w-0 flex-1 truncate">{chat.title}</span>
       )}
 
       <DropdownMenu>
