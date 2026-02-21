@@ -1,41 +1,24 @@
 
+### Overview
+I will implement an autocomplete search feature for the "Add Book" dialog. As you type a book title, the app will fetch suggestions from the Open Library API. Selecting a suggestion will automatically fill in both the Title and Author fields, ensuring accuracy and saving you time.
 
-## Add Chapter Summaries to Books
+### User Experience
+*   When you open the "Add Book" dialog, the "Title" field will now act as a search box.
+*   As you type, a dropdown list of matching books (with their authors and covers) will appear.
+*   Selecting a book from the list will instantly populate the Title and Author inputs.
+*   You can still type manually if the book isn't found in the database.
 
-### What changes
-When a book is added, the AI will now also generate a summary for each chapter (title and brief summary). These chapters will be stored in the database and displayed as expandable dropdowns on the book detail page.
+### Technical Steps
+1.  **API Integration**: Add a new function in `src/lib/api.ts` called `searchBooks(query: string)` that calls the Open Library Search API (`https://openlibrary.org/search.json?q=...`).
+2.  **Search Logic**:
+    *   Implement a debounce in `src/pages/Index.tsx` so we don't spam the API on every single keystroke.
+    *   Add state to manage search results and a "searching" loading indicator.
+3.  **UI Components**:
+    *   Use the existing `Command` and `Popover` components (or a similar dropdown pattern) to display the search results under the Title input.
+    *   Update the `addMutation` to use the selected book data.
+4.  **Refinement**: Ensure that if a user just wants to type a custom title and press Enter, it still works as it does now (manual entry fallback).
 
-### Steps
-
-**1. Database: Add `chapters` column to `books` table**
-
-Add a new JSONB column `chapters` to the `books` table with a default of `'[]'`. Each entry will be an object like:
-```text
-{ "number": 1, "title": "Chapter Title", "summary": "Brief summary..." }
-```
-
-**2. Update the AI summary edge function**
-
-Modify `supabase/functions/generate-book-summary/index.ts` to also request chapter-by-chapter summaries from the AI. The tool schema will be extended to include a `chapters` array with `number`, `title`, and `summary` fields for each chapter.
-
-**3. Update the API layer**
-
-- Update the `Book` interface in `src/lib/api.ts` to include a `chapters` field (array of `{ number: number; title: string; summary: string }`).
-- Update `addBook` to save the returned `chapters` data alongside `summary` and `key_learnings`.
-
-**4. Update the Book Detail page**
-
-Modify `src/pages/BookDetail.tsx` to display chapters as an accordion (expandable dropdowns) below the main summary section, using the existing Radix UI Accordion component. Each item shows the chapter number and title as the trigger, with the chapter summary revealed on click.
-
-**5. Update the chat system prompt**
-
-Update `supabase/functions/chat/index.ts` to include chapter data in the book context passed to the AI, and update the anti-hallucination instructions so the AI can now reference real chapter names.
-
----
-
-### Technical Details
-
-- **Migration SQL**: `ALTER TABLE public.books ADD COLUMN chapters jsonb DEFAULT '[]'::jsonb;`
-- **Existing books** will have an empty `chapters` array and will continue to display normally. Only newly added books will get chapter data.
-- The Accordion component from `src/components/ui/accordion.tsx` is already installed and will be reused.
-- The `types.ts` file will auto-update after the migration.
+### Impact
+*   **Accuracy**: Eliminates typos in titles and authors.
+*   **Speed**: Faster than typing everything manually.
+*   **Reliability**: Since the API is free and doesn't require keys, there's no risk of it "shutting off" due to cost.
