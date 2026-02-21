@@ -13,6 +13,7 @@ export interface Book {
   summary: string | null;
   key_learnings: string[];
   chapters: BookChapter[];
+  cover_id: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -30,11 +31,11 @@ export async function fetchBooks(): Promise<Book[]> {
   }));
 }
 
-export async function addBook(title: string, author: string): Promise<Book> {
+export async function addBook(title: string, author: string, coverId?: number | null): Promise<Book> {
   // First insert the book
   const { data: book, error: insertError } = await supabase
     .from("books")
-    .insert({ title, author })
+    .insert({ title, author, cover_id: coverId ?? null })
     .select()
     .single();
   if (insertError) throw insertError;

@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           author: string
           chapters: Json | null
+          cover_id: number | null
           created_at: string
           id: string
           key_learnings: Json | null
@@ -28,6 +29,7 @@ export type Database = {
         Insert: {
           author: string
           chapters?: Json | null
+          cover_id?: number | null
           created_at?: string
           id?: string
           key_learnings?: Json | null
@@ -38,6 +40,7 @@ export type Database = {
         Update: {
           author?: string
           chapters?: Json | null
+          cover_id?: number | null
           created_at?: string
           id?: string
           key_learnings?: Json | null

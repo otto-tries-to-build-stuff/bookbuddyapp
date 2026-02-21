@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, BookOpen, Loader2 } from "lucide-react";
 import { fetchBooks } from "@/lib/api";
+import { getCoverUrl } from "@/lib/openLibrary";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const BookDetail = () => {
@@ -46,6 +47,18 @@ const BookDetail = () => {
       </header>
 
       <main className="mx-auto max-w-3xl px-6 py-12">
+        {(() => {
+          const coverUrl = getCoverUrl(book.cover_id, "L");
+          return coverUrl ? (
+            <div className="mb-8 flex justify-center">
+              <img
+                src={coverUrl}
+                alt={`Cover of ${book.title}`}
+                className="h-64 rounded-lg object-contain shadow-md"
+              />
+            </div>
+          ) : null;
+        })()}
         <h1 className="mb-2 text-5xl leading-tight">{book.title}</h1>
         <p className="mb-10 text-lg text-muted-foreground">by {book.author}</p>
 
