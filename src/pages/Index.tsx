@@ -1,4 +1,5 @@
 import { useState } from "react";
+import bookmindLogo from "@/assets/bookmind-logo.png";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { Plus, BookOpen, MessageCircle, Trash2, Loader2, Menu } from "lucide-react";
@@ -68,7 +69,7 @@ const Index = () => {
       <header className="px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-lg items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-accent" />
+            <img src={bookmindLogo} alt="BookMind" className="h-6 w-6" />
             <span className="text-sm font-medium text-foreground">BookMind</span>
           </Link>
           <div className="flex items-center gap-1">
