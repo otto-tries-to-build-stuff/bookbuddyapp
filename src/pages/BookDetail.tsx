@@ -8,6 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
@@ -56,19 +57,21 @@ const BookDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border">
-        <div className="mx-auto flex max-w-3xl items-center gap-4 px-6 py-5">
-          <Link to="/" className="rounded-md p-1.5 text-muted-foreground hover:bg-secondary">
+      {/* Header */}
+      <header className="px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-lg items-center gap-3">
+          <Link to="/" className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-accent" />
+            <BookOpen className="h-4 w-4 text-accent" />
             <span className="text-sm text-muted-foreground">BookMind</span>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-6 py-12">
+      <main className="mx-auto max-w-lg px-4 pb-16 pt-4 sm:px-6">
+        {/* Cover */}
         {(() => {
           const coverUrl = getCoverUrl(book.cover_id, "L");
           return coverUrl ? (
@@ -76,53 +79,58 @@ const BookDetail = () => {
               <img
                 src={coverUrl}
                 alt={`Cover of ${book.title}`}
-                className="h-64 rounded-lg object-contain shadow-md"
+                className="h-72 rounded-2xl object-contain shadow-lg"
               />
             </div>
           ) : null;
         })()}
-        <h1 className="mb-2 text-5xl leading-tight">{book.title}</h1>
-        <p className="mb-10 text-lg text-muted-foreground">by {book.author}</p>
+
+        {/* Title & Author */}
+        <h1 className="mb-1 text-3xl leading-tight sm:text-4xl">{book.title}</h1>
+        <p className="mb-10 text-base text-muted-foreground">by {book.author}</p>
 
         {book.summary ? (
-          <>
-            <section className="mb-12">
-              <h2 className="mb-4 text-2xl">Summary</h2>
-              <p className="whitespace-pre-line leading-relaxed text-muted-foreground">
+          <div className="space-y-10">
+            {/* Summary */}
+            <section>
+              <h2 className="mb-3 text-xl">Summary</h2>
+              <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
                 {book.summary}
               </p>
             </section>
 
+            {/* Key Takeaways */}
             {book.key_learnings.length > 0 && (
               <section>
-                <h2 className="mb-4 text-2xl">Key Takeaways</h2>
+                <h2 className="mb-3 text-xl">Key Takeaways</h2>
                 <ul className="space-y-3">
                   {book.key_learnings.map((learning, i) => (
                     <li key={i} className="flex gap-3">
-                      <span className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-medium text-accent">
+                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-medium text-accent">
                         {i + 1}
                       </span>
-                      <span className="leading-relaxed text-muted-foreground">{learning}</span>
+                      <span className="text-sm leading-relaxed text-muted-foreground">{learning}</span>
                     </li>
                   ))}
                 </ul>
               </section>
             )}
 
+            {/* Chapters */}
             {book.chapters.length > 0 && (
-              <section className="mt-12">
-                <h2 className="mb-4 text-2xl">Chapters</h2>
+              <section>
+                <h2 className="mb-3 text-xl">Chapters</h2>
                 <Accordion type="single" collapsible className="w-full">
                   {book.chapters.map((chapter) => (
                     <AccordionItem key={chapter.number} value={`chapter-${chapter.number}`}>
-                      <AccordionTrigger className="text-left">
+                      <AccordionTrigger className="text-left text-sm">
                         <span>
-                          <span className="mr-2 text-accent font-medium">Ch. {chapter.number}</span>
+                          <span className="mr-2 font-medium text-accent">Ch. {chapter.number}</span>
                           {chapter.title}
                         </span>
                       </AccordionTrigger>
                       <AccordionContent>
-                        <p className="leading-relaxed text-muted-foreground">{chapter.summary}</p>
+                        <p className="text-sm leading-relaxed text-muted-foreground">{chapter.summary}</p>
                       </AccordionContent>
                     </AccordionItem>
                   ))}
@@ -131,10 +139,10 @@ const BookDetail = () => {
             )}
 
             {/* Personal Notes */}
-            <section className="mt-12">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="flex items-center gap-2 text-2xl">
-                  <PenLine className="h-5 w-5 text-accent" />
+            <section>
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="flex items-center gap-2 text-xl">
+                  <PenLine className="h-4 w-4 text-accent" />
                   My Notes
                 </h2>
                 {!editing && (
@@ -149,7 +157,7 @@ const BookDetail = () => {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Write your personal notes, reflections, and key takeaways here…"
-                    className="min-h-[160px] resize-y"
+                    className="min-h-[140px] resize-y rounded-xl text-sm"
                   />
                   <div className="flex gap-2">
                     <Button
@@ -167,17 +175,17 @@ const BookDetail = () => {
                   </div>
                 </div>
               ) : notes ? (
-                <p className="whitespace-pre-line leading-relaxed text-muted-foreground">{notes}</p>
+                <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{notes}</p>
               ) : (
                 <button
                   onClick={() => setEditing(true)}
-                  className="w-full rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground/70 transition-colors hover:border-accent/50 hover:text-muted-foreground"
+                  className="w-full rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground/70 transition-colors hover:border-accent/50 hover:text-muted-foreground"
                 >
                   Click to add your personal notes…
                 </button>
               )}
             </section>
-          </>
+          </div>
         ) : (
           <div className="flex items-center gap-3 text-muted-foreground">
             <Loader2 className="h-5 w-5 animate-spin" />
