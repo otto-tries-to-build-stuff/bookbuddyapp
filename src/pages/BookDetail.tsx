@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, BookOpen, Loader2 } from "lucide-react";
 import { fetchBooks } from "@/lib/api";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -70,6 +71,27 @@ const BookDetail = () => {
                     </li>
                   ))}
                 </ul>
+              </section>
+            )}
+
+            {book.chapters.length > 0 && (
+              <section className="mt-12">
+                <h2 className="mb-4 text-2xl">Chapters</h2>
+                <Accordion type="single" collapsible className="w-full">
+                  {book.chapters.map((chapter) => (
+                    <AccordionItem key={chapter.number} value={`chapter-${chapter.number}`}>
+                      <AccordionTrigger className="text-left">
+                        <span>
+                          <span className="mr-2 text-accent font-medium">Ch. {chapter.number}</span>
+                          {chapter.title}
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <p className="leading-relaxed text-muted-foreground">{chapter.summary}</p>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
               </section>
             )}
           </>

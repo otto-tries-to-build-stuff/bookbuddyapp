@@ -27,11 +27,9 @@ serve(async (req) => {
             content: `You are a book expert. When given a book title and author, provide:
 1. A concise summary (2-3 paragraphs)
 2. 5-7 key learnings/takeaways as an array
+3. A chapter-by-chapter breakdown with each chapter's number, title, and a brief summary (2-3 sentences)
 
-Respond with valid JSON in this exact format:
-{"summary": "...", "key_learnings": ["learning 1", "learning 2", ...]}
-
-Only respond with the JSON, no other text.`,
+Only respond with the JSON via the tool call, no other text.`,
           },
           {
             role: "user",
@@ -53,8 +51,21 @@ Only respond with the JSON, no other text.`,
                     items: { type: "string" },
                     description: "5-7 key takeaways from the book",
                   },
+                  chapters: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        number: { type: "number", description: "Chapter number" },
+                        title: { type: "string", description: "Chapter title" },
+                        summary: { type: "string", description: "Brief 2-3 sentence summary of the chapter" },
+                      },
+                      required: ["number", "title", "summary"],
+                    },
+                    description: "Chapter-by-chapter breakdown of the book",
+                  },
                 },
-                required: ["summary", "key_learnings"],
+                required: ["summary", "key_learnings", "chapters"],
                 additionalProperties: false,
               },
             },
