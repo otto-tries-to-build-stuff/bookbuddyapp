@@ -14,6 +14,7 @@ import {
   fetchChatMessages,
   saveChatMessage,
   updateChatTitle,
+  generateChatTitle,
 } from "@/lib/api";
 import ReactMarkdown from "react-markdown";
 import ChatSidebar from "@/components/ChatSidebar";
@@ -83,7 +84,7 @@ const Chat = () => {
     let chatId = activeChatId;
     if (!chatId) {
       try {
-        const chat = await createChat(text.slice(0, 60));
+        const chat = await createChat("New Chat");
         chatId = chat.id;
         setActiveChatId(chatId);
         queryClient.invalidateQueries({ queryKey: ["chats"] });
@@ -122,7 +123,8 @@ const Chat = () => {
           }
           // Auto-title from first user message
           if (allMessages.filter((m) => m.role === "user").length === 1) {
-            await updateChatTitle(finalChatId, text.slice(0, 60));
+            const title = await generateChatTitle(text);
+            await updateChatTitle(finalChatId, title);
             queryClient.invalidateQueries({ queryKey: ["chats"] });
           }
         },

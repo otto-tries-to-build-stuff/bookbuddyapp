@@ -193,6 +193,17 @@ export async function saveChatMessage(chatId: string, role: "user" | "assistant"
   return data as ChatMessage;
 }
 
+export async function generateChatTitle(message: string): Promise<string> {
+  const { data, error } = await supabase.functions.invoke("generate-chat-title", {
+    body: { message },
+  });
+  if (error) {
+    console.error("Failed to generate title:", error);
+    return message.slice(0, 40);
+  }
+  return data?.title || message.slice(0, 40);
+}
+
 type Msg = { role: "user" | "assistant"; content: string };
 
 export async function streamChat({
