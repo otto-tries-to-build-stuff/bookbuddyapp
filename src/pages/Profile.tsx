@@ -17,21 +17,21 @@ const ProfilePage = () => {
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile"],
-    queryFn: fetchProfile,
+    queryFn: fetchProfile
   });
 
   const [name, setName] = useState<string | null>(null);
   const displayName = name ?? profile?.name ?? "";
 
   const updateMutation = useMutation({
-    mutationFn: (data: { name?: string; avatar_url?: string }) =>
-      updateProfile(profile!.id, data),
+    mutationFn: (data: {name?: string;avatar_url?: string;}) =>
+    updateProfile(profile!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       toast({ title: "Profile updated" });
     },
     onError: (e) =>
-      toast({ title: "Error", description: e.message, variant: "destructive" }),
+    toast({ title: "Error", description: e.message, variant: "destructive" })
   });
 
   const avatarMutation = useMutation({
@@ -45,7 +45,7 @@ const ProfilePage = () => {
       toast({ title: "Avatar updated" });
     },
     onError: (e) =>
-      toast({ title: "Upload failed", description: e.message, variant: "destructive" }),
+    toast({ title: "Upload failed", description: e.message, variant: "destructive" })
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,18 +63,18 @@ const ProfilePage = () => {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
     <div className="min-h-screen bg-background">
       <header className="px-4 py-3 sm:px-6">
-        <div className="mx-auto flex max-w-lg md:max-w-2xl items-center gap-3">
+        <div className="mx-auto flex max-w-lg items-center gap-3">
           <Link
             to="/"
-            className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary"
-          >
+            className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary">
+
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="flex items-center gap-2">
@@ -84,16 +84,16 @@ const ProfilePage = () => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-lg md:max-w-2xl px-4 pb-16 pt-8 sm:px-6">
-        <h1 className="mb-8 text-3xl">Profile</h1>
+      <main className="mx-auto max-w-lg px-4 pb-16 pt-8 sm:px-6">
+        <h1 className="mb-8 text-3xl">You profile</h1>
 
         {/* Avatar */}
         <div className="mb-8 flex flex-col items-center gap-4">
           <div className="relative">
             <Avatar className="h-28 w-28 border-2 border-border">
-              {profile?.avatar_url ? (
-                <AvatarImage src={profile.avatar_url} alt="Profile avatar" />
-              ) : null}
+              {profile?.avatar_url ?
+              <AvatarImage src={profile.avatar_url} alt="Profile avatar" /> :
+              null}
               <AvatarFallback className="bg-secondary text-muted-foreground">
                 <User className="h-10 w-10" />
               </AvatarFallback>
@@ -101,25 +101,25 @@ const ProfilePage = () => {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={avatarMutation.isPending}
-              className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
-            >
-              {avatarMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Camera className="h-4 w-4" />
-              )}
+              className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50">
+
+              {avatarMutation.isPending ?
+              <Loader2 className="h-4 w-4 animate-spin" /> :
+
+              <Camera className="h-4 w-4" />
+              }
             </button>
             <input
               ref={fileInputRef}
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="hidden"
-            />
+              className="hidden" />
+
           </div>
-          {profile?.name && (
-            <p className="text-lg font-medium text-foreground">{profile.name}</p>
-          )}
+          {profile?.name &&
+          <p className="text-lg font-medium text-foreground">{profile.name}</p>
+          }
         </div>
 
         {/* Name */}
@@ -130,29 +130,29 @@ const ProfilePage = () => {
               id="name"
               placeholder="Enter your name"
               value={displayName}
-              onChange={(e) => setName(e.target.value)}
-            />
+              onChange={(e) => setName(e.target.value)} />
+
           </div>
           <Button
             onClick={handleSaveName}
             disabled={
-              updateMutation.isPending ||
-              !displayName.trim() ||
-              displayName.trim() === profile?.name
+            updateMutation.isPending ||
+            !displayName.trim() ||
+            displayName.trim() === profile?.name
             }
-            className="w-full gap-2"
-          >
-            {updateMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4" />
-            )}
+            className="w-full gap-2">
+
+            {updateMutation.isPending ?
+            <Loader2 className="h-4 w-4 animate-spin" /> :
+
+            <Save className="h-4 w-4" />
+            }
             Save
           </Button>
         </div>
       </main>
-    </div>
-  );
+    </div>);
+
 };
 
 export default ProfilePage;
