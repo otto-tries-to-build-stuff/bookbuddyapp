@@ -35,133 +35,113 @@ serve(async (req) => {
     }
 
     const hasRealTOC = realTOC.length > 0;
-
-    let systemPrompt: string;
-    let userPrompt: string;
-
-    if (hasRealTOC) {
-      systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
-1. A concise summary (2-3 paragraphs)
-2. 5-7 key learnings/takeaways as an array
-
-The table of contents has already been provided — do NOT generate one. Only respond with the JSON via the tool call, no other text.`;
-
-      userPrompt = `Generate the summary and key takeaways for "${title}" by ${author}.`;
-    } else {
-      systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
-1. A concise summary (2-3 paragraphs)
-2. 5-7 key learnings/takeaways as an array
-3. The officially published table of contents
-
-Only respond with the JSON via the tool call, no other text.`;
-
-      userPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
-1. A concise summary (2-3 paragraphs)
-2. 5-7 key learnings/takeaways as an array
-3. The officially published table of contents`;
-    }
-
     const model = "openai/gpt-5.2";
+    const aiHeaders = {
+      Authorization: `Bearer ${LOVABLE_API_KEY}`,
+      "Content-Type": "application/json",
+    };
 
-    const tocProperty = hasRealTOC
-      ? {}
-      : {
-          table_of_contents: {
-            type: "string",
-            description: "A structured text block listing all chapters, one per line. No disclaimers or caveats.",
-          },
-        };
-
-    const requiredFields = hasRealTOC
-      ? ["summary", "key_learnings"]
-      : ["summary", "key_learnings", "table_of_contents"];
-
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        tools: [
-          {
-            type: "function",
-            function: {
-              name: "book_summary",
-              description: "Return a book summary and key learnings",
-              parameters: {
-                type: "object",
-                properties: {
-                  summary: { type: "string", description: "A 2-3 paragraph summary of the book" },
-                  key_learnings: {
-                    type: "array",
-                    items: { type: "string" },
-                    description: "5-7 key takeaways from the book",
-                  },
-                  ...tocProperty,
-                },
-                required: requiredFields,
-                additionalProperties: false,
-              },
-            },
-          },
-        ],
-        tool_choice: { type: "function", function: { name: "book_summary" } },
-      }),
-    });
-
-    if (!response.ok) {
+    // Helper: handle non-OK AI responses
+    const handleAIError = async (response: Response) => {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded, please try again later." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "AI credits exhausted. Please add funds." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const t = await response.text();
       console.error("AI gateway error:", response.status, t);
       throw new Error("AI gateway error");
-    }
-
-    const data = await response.json();
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-
-    // Convert TOC to array of strings regardless of source
-    const toTocArray = (toc: any): string[] => {
-      if (Array.isArray(toc)) return toc;
-      if (typeof toc === "string")
-        return toc
-          .split("\n")
-          .map((l: string) => l.trim())
-          .filter(Boolean);
-      return [];
     };
+
+    // ── Pass 1: Summary + Key Learnings (forced function calling) ──
+    const pass1Promise = fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: aiHeaders,
+      body: JSON.stringify({
+        model,
+        temperature: 0,
+        messages: [
+          { role: "system", content: `You are a book expert. For the book "${title}" by ${author}, provide a concise summary (2-3 paragraphs) and 5-7 key learnings/takeaways. Only respond via the tool call.` },
+          { role: "user", content: `Generate the summary and key takeaways for "${title}" by ${author}.` },
+        ],
+        tools: [{
+          type: "function",
+          function: {
+            name: "book_summary",
+            description: "Return a book summary and key learnings",
+            parameters: {
+              type: "object",
+              properties: {
+                summary: { type: "string", description: "A 2-3 paragraph summary of the book" },
+                key_learnings: { type: "array", items: { type: "string" }, description: "5-7 key takeaways from the book" },
+              },
+              required: ["summary", "key_learnings"],
+              additionalProperties: false,
+            },
+          },
+        }],
+        tool_choice: { type: "function", function: { name: "book_summary" } },
+      }),
+    });
+
+    // ── Pass 2: TOC via free-form chat (only if no real TOC) ──
+    const pass2Promise = hasRealTOC
+      ? Promise.resolve(null)
+      : fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: aiHeaders,
+          body: JSON.stringify({
+            model,
+            temperature: 0,
+            messages: [
+              { role: "system", content: "You are a book expert. List the major sections and chapter titles as they appear in the book. Output one chapter title per line, nothing else — no numbering, no commentary, no disclaimers. If you are unsure about exact titles, provide your best approximation of the structure." },
+              { role: "user", content: `List the chapter titles for "${title}" by ${author}.` },
+            ],
+          }),
+        });
+
+    const [pass1Response, pass2Response] = await Promise.all([pass1Promise, pass2Promise]);
+
+    // Handle errors
+    if (!pass1Response.ok) return handleAIError(pass1Response);
+    if (pass2Response && !pass2Response.ok) return handleAIError(pass2Response);
+
+    // Parse Pass 1
+    const pass1Data = await pass1Response.json();
+    const toolCall = pass1Data.choices?.[0]?.message?.tool_calls?.[0];
+    let summary = "";
+    let key_learnings: string[] = [];
 
     if (toolCall?.function?.arguments) {
       const parsed = JSON.parse(toolCall.function.arguments);
-      const toc = hasRealTOC ? realTOC : toTocArray(parsed.table_of_contents);
-      return new Response(JSON.stringify({ ...parsed, table_of_contents: toc }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      summary = parsed.summary || "";
+      key_learnings = Array.isArray(parsed.key_learnings) ? parsed.key_learnings : [];
+    } else {
+      const content = pass1Data.choices?.[0]?.message?.content || "";
+      const cleaned = content.replace(/```json\n?|\n?```/g, "").trim();
+      const parsed = JSON.parse(cleaned);
+      summary = parsed.summary || "";
+      key_learnings = Array.isArray(parsed.key_learnings) ? parsed.key_learnings : [];
     }
 
-    // Fallback: try parsing content directly
-    const content = data.choices?.[0]?.message?.content || "";
-    const cleaned = content.replace(/```json\n?|\n?```/g, "").trim();
-    const parsed = JSON.parse(cleaned);
-    const toc = hasRealTOC ? realTOC : toTocArray(parsed.table_of_contents);
+    // Parse Pass 2 (TOC)
+    let toc: string[];
+    if (hasRealTOC) {
+      toc = realTOC;
+    } else if (pass2Response) {
+      const pass2Data = await pass2Response.json();
+      const tocText = pass2Data.choices?.[0]?.message?.content || "";
+      toc = tocText.split("\n").map((l: string) => l.trim()).filter(Boolean);
+    } else {
+      toc = [];
+    }
 
-    return new Response(JSON.stringify({ ...parsed, table_of_contents: toc }), {
+    return new Response(JSON.stringify({ summary, key_learnings, table_of_contents: toc }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
