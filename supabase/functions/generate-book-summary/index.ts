@@ -63,7 +63,7 @@ Only respond with the JSON via the tool call, no other text.`;
       userPrompt = `Real chapters from the book:
 ${chapterList}`;
     } else {
-      systemPrompt = `You are a book expert. For the book "${title}" by ${author}, can you provide:
+      systemPrompt = `You are a book expert. For the book ${title} by ${author}, can you provide:
 1. A concise summary (2-3 paragraphs)
 2. 5-7 key learnings/takeaways as an array
 3. A COMPLETE chapter-by-chapter breakdown. You MUST include ALL chapters — do NOT skip any. Double-check that every chapter is listed. Each chapter needs its number, title, and a brief summary (2-3 sentences).
