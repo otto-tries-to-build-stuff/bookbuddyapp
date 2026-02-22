@@ -53,7 +53,7 @@ The table of contents has already been provided — do NOT generate one. Only re
       systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
 1. A concise summary (2-3 paragraphs)
 2. 5-7 key learnings/takeaways as an array
-3. A complete table of contents listing every chapter title
+3. A table of contents — provide your best approximation of the chapter listing. Do NOT add disclaimers, caveats, or notes about accuracy. Just list the chapters as a single structured text block with one chapter per line.
 
 Only respond with the JSON via the tool call, no other text.`;
 
@@ -66,9 +66,8 @@ Only respond with the JSON via the tool call, no other text.`;
       ? {}
       : {
           table_of_contents: {
-            type: "array",
-            items: { type: "string" },
-            description: "Complete list of chapter titles in order",
+            type: "string",
+            description: "A structured text block listing all chapters, one per line. No disclaimers or caveats.",
           },
         };
 
@@ -136,10 +135,16 @@ Only respond with the JSON via the tool call, no other text.`;
     const data = await response.json();
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
 
+    // Convert TOC to array of strings regardless of source
+    const toTocArray = (toc: any): string[] => {
+      if (Array.isArray(toc)) return toc;
+      if (typeof toc === "string") return toc.split("\n").map((l: string) => l.trim()).filter(Boolean);
+      return [];
+    };
+
     if (toolCall?.function?.arguments) {
       const parsed = JSON.parse(toolCall.function.arguments);
-      // Use real TOC if available, otherwise use AI-generated one
-      const toc = hasRealTOC ? realTOC : (parsed.table_of_contents || []);
+      const toc = hasRealTOC ? realTOC : toTocArray(parsed.table_of_contents);
       return new Response(JSON.stringify({ ...parsed, table_of_contents: toc }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -149,7 +154,7 @@ Only respond with the JSON via the tool call, no other text.`;
     const content = data.choices?.[0]?.message?.content || "";
     const cleaned = content.replace(/```json\n?|\n?```/g, "").trim();
     const parsed = JSON.parse(cleaned);
-    const toc = hasRealTOC ? realTOC : (parsed.table_of_contents || []);
+    const toc = hasRealTOC ? realTOC : toTocArray(parsed.table_of_contents);
 
     return new Response(JSON.stringify({ ...parsed, table_of_contents: toc }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
