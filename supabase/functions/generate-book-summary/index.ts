@@ -51,14 +51,14 @@ The table of contents has already been provided — do NOT generate one. Only re
       systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
 1. A concise summary (2-3 paragraphs)
 2. 5-7 key learnings/takeaways as an array
-3. A table of contents
+3. The officially published table of contents
 
 Only respond with the JSON via the tool call, no other text.`;
 
       userPrompt = `ou are a book expert. For the book "${title}" by ${author}, provide:
 1. A concise summary (2-3 paragraphs)
 2. 5-7 key learnings/takeaways as an array
-3. A table of contents`;
+3. The officially published table of contents`;
     }
 
     const model = "openai/gpt-5.2";
