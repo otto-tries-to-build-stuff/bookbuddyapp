@@ -32,7 +32,7 @@ export async function fetchBooks(): Promise<Book[]> {
   }));
 }
 
-export async function addBook(title: string, author: string, coverId?: number | null): Promise<Book> {
+export async function addBook(title: string, author: string, coverId?: number | null, editionKey?: string | null): Promise<Book> {
   // First insert the book
   const { data: book, error: insertError } = await supabase
     .from("books")
@@ -45,7 +45,7 @@ export async function addBook(title: string, author: string, coverId?: number | 
   try {
     const { data: aiData, error: fnError } = await supabase.functions.invoke(
       "generate-book-summary",
-      { body: { title, author } }
+      { body: { title, author, editionKey: editionKey ?? null } }
     );
 
     if (!fnError && aiData?.summary) {

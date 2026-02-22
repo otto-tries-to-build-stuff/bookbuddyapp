@@ -3,12 +3,13 @@ export interface OpenLibraryBook {
   author: string;
   coverId: number | null;
   firstPublishYear: number | null;
+  editionKey: string | null;
 }
 
 export async function searchOpenLibrary(query: string): Promise<OpenLibraryBook[]> {
   if (!query || query.length < 2) return [];
 
-  const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=8&fields=title,author_name,cover_i,first_publish_year`;
+  const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=8&fields=title,author_name,cover_i,first_publish_year,edition_key`;
   const resp = await fetch(url);
   if (!resp.ok) return [];
 
@@ -18,6 +19,7 @@ export async function searchOpenLibrary(query: string): Promise<OpenLibraryBook[
     author: doc.author_name?.[0] || "Unknown",
     coverId: doc.cover_i ?? null,
     firstPublishYear: doc.first_publish_year ?? null,
+    editionKey: doc.edition_key?.[0] ?? null,
   }));
 }
 

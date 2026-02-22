@@ -36,6 +36,7 @@ const Index = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [coverId, setCoverId] = useState<number | null>(null);
+  const [editionKey, setEditionKey] = useState<string | null>(null);
 
   const { data: books = [], isLoading } = useQuery({
     queryKey: ["books"],
@@ -43,13 +44,14 @@ const Index = () => {
   });
 
   const addMutation = useMutation({
-    mutationFn: () => addBook(title, author, coverId),
+    mutationFn: () => addBook(title, author, coverId, editionKey),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["books"] });
       setOpen(false);
       setTitle("");
       setAuthor("");
       setCoverId(null);
+      setEditionKey(null);
       toast({ title: "Book added!", description: "AI is generating the summary." });
     },
     onError: (e) => toast({ title: "Error", description: e.message, variant: "destructive" })
@@ -105,6 +107,7 @@ const Index = () => {
                         setTitle(book.title);
                         setAuthor(book.author);
                         setCoverId(book.coverId);
+                        setEditionKey(book.editionKey);
                       }} />
 
                   </div>
