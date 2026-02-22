@@ -1,19 +1,34 @@
 
 
-# Switch Book Summary Model to OpenAI GPT-5.2
+# Render Table of Contents as Plain Text
 
-## What Changes
+## Overview
+Replace the numbered list (with circled numbers) in the Table of Contents section with a simple plain text block. The AI response will be displayed as-is, preserving any natural formatting (numbering, parts, sections) the model includes.
 
-Update the `generate-book-summary` edge function to use `openai/gpt-5.2` instead of the current Gemini models. This model has enhanced reasoning capabilities which should help with accurately identifying and listing all chapters.
+## Changes
 
-## Technical Details
+**File: `src/pages/BookDetail.tsx`**
 
-**File: `supabase/functions/generate-book-summary/index.ts`**
+Replace the current `<ol>` with numbered circle badges:
+```
+<ol className="space-y-2">
+  {book.table_of_contents.map((chapter, i) => (
+    <li key={i} className="flex gap-3">
+      <span className="...rounded-full...">{i + 1}</span>
+      <span>...</span>
+    </li>
+  ))}
+</ol>
+```
 
-- Change the model selection (lines ~88-90) from:
-  - `google/gemini-3-flash-preview` (when real chapters exist) -> `openai/gpt-5.2`
-  - `google/gemini-2.5-pro` (fallback/no chapters) -> `openai/gpt-5.2`
-- Use `openai/gpt-5.2` for both cases since its stronger reasoning should handle both scenarios well
+With a simple pre-formatted text block (same style as the Summary section):
+```
+<p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+  {book.table_of_contents.join("\n")}
+</p>
+```
 
-This is a one-line change -- no other files need updating.
+This joins the array back into a newline-separated string and renders it exactly as the AI returned it -- no extra numbering or styling added by the UI.
+
+No backend or prompt changes required.
 
