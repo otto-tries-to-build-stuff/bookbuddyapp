@@ -13,9 +13,7 @@ async function fetchEditionTOC(editionKey: string): Promise<string[]> {
     const data = await resp.json();
     const toc = data.table_of_contents;
     if (!Array.isArray(toc) || toc.length === 0) return [];
-    return toc
-      .filter((entry: any) => entry.title && entry.title.trim())
-      .map((entry: any) => entry.title.trim());
+    return toc.filter((entry: any) => entry.title && entry.title.trim()).map((entry: any) => entry.title.trim());
   } catch {
     return [];
   }
@@ -53,11 +51,14 @@ The table of contents has already been provided — do NOT generate one. Only re
       systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
 1. A concise summary (2-3 paragraphs)
 2. 5-7 key learnings/takeaways as an array
-3. A table of contents — provide your best approximation of the chapter listing. Do NOT add disclaimers, caveats, or notes about accuracy. Just list the chapters as a single structured text block with one chapter per line.
+3. A table of contents
 
 Only respond with the JSON via the tool call, no other text.`;
 
-      userPrompt = `Generate the summary, key takeaways, and table of contents for "${title}" by ${author}.`;
+      userPrompt = `ou are a book expert. For the book "${title}" by ${author}, provide:
+1. A concise summary (2-3 paragraphs)
+2. 5-7 key learnings/takeaways as an array
+3. A table of contents`;
     }
 
     const model = "openai/gpt-5.2";
@@ -138,7 +139,11 @@ Only respond with the JSON via the tool call, no other text.`;
     // Convert TOC to array of strings regardless of source
     const toTocArray = (toc: any): string[] => {
       if (Array.isArray(toc)) return toc;
-      if (typeof toc === "string") return toc.split("\n").map((l: string) => l.trim()).filter(Boolean);
+      if (typeof toc === "string")
+        return toc
+          .split("\n")
+          .map((l: string) => l.trim())
+          .filter(Boolean);
       return [];
     };
 
