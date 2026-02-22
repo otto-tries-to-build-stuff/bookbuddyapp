@@ -54,26 +54,24 @@ serve(async (req) => {
         .map((ch, i) => `${i + 1}. ${ch.title}`)
         .join("\n");
 
-      systemPrompt = `You are a book expert. You are given a book title, author, and its real table of contents. Provide:
+      systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
 1. A concise summary (2-3 paragraphs)
 2. 5-7 key learnings/takeaways as an array
 3. For EACH chapter listed below, write a 2-3 sentence summary. Use the exact chapter titles provided. Do NOT skip any chapters.
 
 Only respond with the JSON via the tool call, no other text.`;
 
-      userPrompt = `Book: "${title}" by ${author}
-
-Real chapters from the book:
+      userPrompt = `Real chapters from the book:
 ${chapterList}`;
     } else {
-      systemPrompt = `You are a book expert. When given a book title and author, provide:
+      systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
 1. A concise summary (2-3 paragraphs)
 2. 5-7 key learnings/takeaways as an array
 3. A COMPLETE chapter-by-chapter breakdown. You MUST include ALL chapters — do NOT skip any. Double-check that every chapter is listed. Each chapter needs its number, title, and a brief summary (2-3 sentences).
 
 Only respond with the JSON via the tool call, no other text.`;
 
-      userPrompt = `Book: "${title}" by ${author}`;
+      userPrompt = `Generate the complete summary and chapter breakdown for this book.`;
     }
 
     const model = "openai/gpt-5.2";
