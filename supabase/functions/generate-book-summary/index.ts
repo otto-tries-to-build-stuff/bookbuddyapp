@@ -99,8 +99,8 @@ serve(async (req) => {
             model,
             temperature: 0,
             messages: [
-              { role: "system", content: "You are a book expert. List the major sections and chapter titles as they appear in the book. Output one chapter title per line, nothing else — no numbering, no commentary, no disclaimers. If you are unsure about exact titles, provide your best approximation of the structure." },
-              { role: "user", content: `List the chapter titles for "${title}" by ${author}.` },
+              { role: "system", content: "List the official table of contents for "${title}" by ${author}. If you are unsure, provide your best approximation of the structure." },
+              { role: "user", content: `List the official table of contents for "${title}" by ${author}.` },
             ],
           }),
         });
