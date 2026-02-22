@@ -87,7 +87,7 @@ export default function ChatSidebar({ activeChatId, onSelectChat, onNewChat }: C
     : items;
 
   return (
-    <div className="flex h-full w-64 flex-col border-r border-border bg-sidebar-background">
+    <div className="chat-sidebar flex h-full w-64 flex-col border-r border-border bg-sidebar-background">
       <div className="shrink-0 p-3">
         <Button onClick={onNewChat} variant="outline" size="sm" className="w-full gap-2">
           <Plus className="h-4 w-4" />
