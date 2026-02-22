@@ -7,8 +7,8 @@ import { fetchBooks, updateBookNotes, deleteBook } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from
+"@/components/ui/alert-dialog";
 import { getCoverUrl } from "@/lib/openLibrary";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,7 +28,7 @@ const BookDetail = () => {
       toast({ title: "Book deleted" });
       navigate("/library");
     },
-    onError: (e) => toast({ title: "Error deleting book", description: e.message, variant: "destructive" }),
+    onError: (e) => toast({ title: "Error deleting book", description: e.message, variant: "destructive" })
   });
 
   const { data: books = [], isLoading } = useQuery({
@@ -97,8 +97,8 @@ const BookDetail = () => {
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => deleteMutation.mutate()}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+
                   {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -123,7 +123,7 @@ const BookDetail = () => {
             null;
           })()}
           <div>
-            <h1 className="mb-1 text-3xl leading-tight sm:text-4xl">{book.title}</h1>
+            <h1 className="mb-1 text-3xl leading-tight sm:text-4xl font-sans font-normal">{book.title}</h1>
             <p className="text-base text-muted-foreground">by {book.author}</p>
           </div>
         </div>
@@ -132,7 +132,7 @@ const BookDetail = () => {
         <div className="space-y-10">
             {/* Summary */}
             <section>
-              <h2 className="mb-3 text-xl">Summary</h2>
+              <h2 className="mb-3 text-xl font-sans">Summary</h2>
               <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
                 {book.summary}
               </p>
@@ -141,7 +141,7 @@ const BookDetail = () => {
             {/* Key Takeaways */}
             {book.key_learnings.length > 0 &&
           <section>
-                <h2 className="mb-3 text-xl">Key Takeaways</h2>
+                <h2 className="mb-3 text-xl font-sans">Key Takeaways</h2>
                 <ul className="space-y-3">
                   {book.key_learnings.map((learning, i) =>
               <li key={i} className="flex gap-3">
@@ -158,12 +158,12 @@ const BookDetail = () => {
             {/* Chapters */}
             {book.chapters.length > 0 &&
           <section>
-                <h2 className="mb-3 text-xl">Chapters</h2>
+                <h2 className="mb-3 text-xl font-sans">Chapters</h2>
                 <Accordion type="single" collapsible className="w-full">
                   {book.chapters.map((chapter) =>
               <AccordionItem key={chapter.number} value={`chapter-${chapter.number}`}>
                       <AccordionTrigger className="text-left text-sm">
-                        <span>
+                        <span className="font-sans">
                           <span className="mr-2 font-medium text-accent">Ch. {chapter.number}</span>
                           {chapter.title}
                         </span>
@@ -180,7 +180,7 @@ const BookDetail = () => {
             {/* Personal Notes */}
             <section>
               <div className="mb-3 flex items-center justify-between">
-                <h2 className="flex items-center gap-2 text-xl">
+                <h2 className="flex items-center gap-2 text-xl font-sans">
                   <PenLine className="h-4 w-4 text-accent" />
                   My Notes
                 </h2>
