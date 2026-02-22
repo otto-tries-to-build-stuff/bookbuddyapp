@@ -10,7 +10,6 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from
 "@/components/ui/alert-dialog";
 import { getCoverUrl } from "@/lib/openLibrary";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -152,28 +151,6 @@ const BookDetail = () => {
                     </li>
               )}
                 </ul>
-              </section>
-          }
-
-            {/* Chapters */}
-            {book.chapters.length > 0 &&
-          <section>
-                <h2 className="mb-3 text-xl font-sans">Chapters</h2>
-                <Accordion type="single" collapsible className="w-full">
-                  {book.chapters.map((chapter) =>
-              <AccordionItem key={chapter.number} value={`chapter-${chapter.number}`}>
-                      <AccordionTrigger className="text-left text-sm">
-                        <span className="font-sans">
-                          <span className="mr-2 font-medium text-accent">Ch. {chapter.number}</span>
-                          {chapter.title}
-                        </span>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <p className="text-sm leading-relaxed text-muted-foreground">{chapter.summary}</p>
-                      </AccordionContent>
-                    </AccordionItem>
-              )}
-                </Accordion>
               </section>
           }
 
