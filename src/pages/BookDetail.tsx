@@ -11,13 +11,13 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
 const BookDetail = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{id: string;}>();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: books = [], isLoading } = useQuery({
     queryKey: ["books"],
-    queryFn: fetchBooks,
+    queryFn: fetchBooks
   });
 
   const book = books.find((b) => b.id === id);
@@ -36,15 +36,15 @@ const BookDetail = () => {
       setEditing(false);
       toast({ title: "Notes saved" });
     },
-    onError: (e) => toast({ title: "Error saving notes", description: e.message, variant: "destructive" }),
+    onError: (e) => toast({ title: "Error saving notes", description: e.message, variant: "destructive" })
   });
 
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+      </div>);
+
   }
 
   if (!book) {
@@ -52,8 +52,8 @@ const BookDetail = () => {
       <div className="flex min-h-screen flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">Book not found</p>
         <Link to="/" className="text-accent underline">Back to library</Link>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -65,8 +65,8 @@ const BookDetail = () => {
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="flex items-center gap-2">
-            <img src={bookmindLogo} alt="BookMind" className="h-5 w-5" />
-            <span className="text-sm text-muted-foreground">BookMind</span>
+            <img alt="BookMind" className="h-5 w-5" src="/lovable-uploads/8c53ea5c-3326-47b6-8dea-bab692fb49b0.png" />
+            <span className="text-sm text-muted-foreground">BookBuddy</span>
           </div>
         </div>
       </header>
@@ -76,15 +76,15 @@ const BookDetail = () => {
         <div className="mb-10 flex flex-col items-center md:flex-row md:items-start md:gap-8">
           {(() => {
             const coverUrl = getCoverUrl(book.cover_id, "L");
-            return coverUrl ? (
-              <div className="mb-6 flex shrink-0 justify-center md:mb-0">
+            return coverUrl ?
+            <div className="mb-6 flex shrink-0 justify-center md:mb-0">
                 <img
-                  src={coverUrl}
-                  alt={`Cover of ${book.title}`}
-                  className="h-72 rounded-2xl object-contain shadow-lg"
-                />
-              </div>
-            ) : null;
+                src={coverUrl}
+                alt={`Cover of ${book.title}`}
+                className="h-72 rounded-2xl object-contain shadow-lg" />
+
+              </div> :
+            null;
           })()}
           <div>
             <h1 className="mb-1 text-3xl leading-tight sm:text-4xl">{book.title}</h1>
@@ -92,8 +92,8 @@ const BookDetail = () => {
           </div>
         </div>
 
-        {book.summary ? (
-          <div className="space-y-10">
+        {book.summary ?
+        <div className="space-y-10">
             {/* Summary */}
             <section>
               <h2 className="mb-3 text-xl">Summary</h2>
@@ -103,29 +103,29 @@ const BookDetail = () => {
             </section>
 
             {/* Key Takeaways */}
-            {book.key_learnings.length > 0 && (
-              <section>
+            {book.key_learnings.length > 0 &&
+          <section>
                 <h2 className="mb-3 text-xl">Key Takeaways</h2>
                 <ul className="space-y-3">
-                  {book.key_learnings.map((learning, i) => (
-                    <li key={i} className="flex gap-3">
+                  {book.key_learnings.map((learning, i) =>
+              <li key={i} className="flex gap-3">
                       <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-medium text-accent">
                         {i + 1}
                       </span>
                       <span className="text-sm leading-relaxed text-muted-foreground">{learning}</span>
                     </li>
-                  ))}
+              )}
                 </ul>
               </section>
-            )}
+          }
 
             {/* Chapters */}
-            {book.chapters.length > 0 && (
-              <section>
+            {book.chapters.length > 0 &&
+          <section>
                 <h2 className="mb-3 text-xl">Chapters</h2>
                 <Accordion type="single" collapsible className="w-full">
-                  {book.chapters.map((chapter) => (
-                    <AccordionItem key={chapter.number} value={`chapter-${chapter.number}`}>
+                  {book.chapters.map((chapter) =>
+              <AccordionItem key={chapter.number} value={`chapter-${chapter.number}`}>
                       <AccordionTrigger className="text-left text-sm">
                         <span>
                           <span className="mr-2 font-medium text-accent">Ch. {chapter.number}</span>
@@ -136,10 +136,10 @@ const BookDetail = () => {
                         <p className="text-sm leading-relaxed text-muted-foreground">{chapter.summary}</p>
                       </AccordionContent>
                     </AccordionItem>
-                  ))}
+              )}
                 </Accordion>
               </section>
-            )}
+          }
 
             {/* Personal Notes */}
             <section>
@@ -148,56 +148,56 @@ const BookDetail = () => {
                   <PenLine className="h-4 w-4 text-accent" />
                   My Notes
                 </h2>
-                {!editing && (
-                  <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
+                {!editing &&
+              <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
                     Edit
                   </Button>
-                )}
+              }
               </div>
-              {editing ? (
-                <div className="space-y-3">
+              {editing ?
+            <div className="space-y-3">
                   <Textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Write your personal notes, reflections, and key takeaways here…"
-                    className="min-h-[140px] resize-y rounded-xl text-sm"
-                  />
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Write your personal notes, reflections, and key takeaways here…"
+                className="min-h-[140px] resize-y rounded-xl text-sm" />
+
                   <div className="flex gap-2">
                     <Button
-                      size="sm"
-                      onClick={() => notesMutation.mutate()}
-                      disabled={notesMutation.isPending}
-                      className="gap-1.5"
-                    >
+                  size="sm"
+                  onClick={() => notesMutation.mutate()}
+                  disabled={notesMutation.isPending}
+                  className="gap-1.5">
+
                       {notesMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
                       Save
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => { setNotes(book.notes ?? ""); setEditing(false); }}>
+                    <Button variant="ghost" size="sm" onClick={() => {setNotes(book.notes ?? "");setEditing(false);}}>
                       Cancel
                     </Button>
                   </div>
-                </div>
-              ) : notes ? (
-                <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{notes}</p>
-              ) : (
-                <button
-                  onClick={() => setEditing(true)}
-                  className="w-full rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground/70 transition-colors hover:border-accent/50 hover:text-muted-foreground"
-                >
+                </div> :
+            notes ?
+            <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{notes}</p> :
+
+            <button
+              onClick={() => setEditing(true)}
+              className="w-full rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground/70 transition-colors hover:border-accent/50 hover:text-muted-foreground">
+
                   Click to add your personal notes…
                 </button>
-              )}
+            }
             </section>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 text-muted-foreground">
+          </div> :
+
+        <div className="flex items-center gap-3 text-muted-foreground">
             <Loader2 className="h-5 w-5 animate-spin" />
             Generating summary…
           </div>
-        )}
+        }
       </main>
-    </div>
-  );
+    </div>);
+
 };
 
 export default BookDetail;
