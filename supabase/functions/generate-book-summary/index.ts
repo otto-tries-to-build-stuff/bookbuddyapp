@@ -69,6 +69,8 @@ ${chapterList}`;
 3. A COMPLETE chapter-by-chapter breakdown. You MUST include ALL chapters — do NOT skip any. Double-check that every chapter is listed. Each chapter needs its number, title, and a brief summary (2-3 sentences).
 
 Only respond with the JSON via the tool call, no other text.`;
+
+      userPrompt = `Generate the complete summary and chapter breakdown for "${title}" by ${author}.`;
     }
 
     const model = "openai/gpt-5.2";
