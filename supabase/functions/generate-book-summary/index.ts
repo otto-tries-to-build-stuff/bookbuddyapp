@@ -101,17 +101,8 @@ Only respond with the JSON via the tool call, no other text.`;
                     description: "5-7 key takeaways from the book",
                   },
                   chapters: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        number: { type: "number", description: "Chapter number" },
-                        title: { type: "string", description: "Chapter title" },
-                        summary: { type: "string", description: "Brief 2-3 sentence summary of the chapter" },
-                      },
-                      required: ["number", "title", "summary"],
-                    },
-                    description: "Chapter-by-chapter breakdown of the book",
+                    type: "string",
+                    description: "Complete chapter-by-chapter breakdown. Format each chapter on its own line as: 'Chapter NUMBER: TITLE — SUMMARY'. Use a newline between each chapter. Include ALL chapters.",
                   },
                 },
                 required: ["summary", "key_learnings", "chapters"],
@@ -147,7 +138,26 @@ Only respond with the JSON via the tool call, no other text.`;
 
     if (toolCall?.function?.arguments) {
       const parsed = JSON.parse(toolCall.function.arguments);
-      return new Response(JSON.stringify(parsed), {
+      // Parse the chapters text block into structured array
+      const chaptersText: string = parsed.chapters || "";
+      const chapters = chaptersText
+        .split("\n")
+        .filter((line: string) => line.trim())
+        .map((line: string) => {
+          const match = line.match(/^Chapter\s+(\d+)\s*:\s*(.+?)\s*[—–-]\s*(.+)$/i);
+          if (match) {
+            return { number: parseInt(match[1]), title: match[2].trim(), summary: match[3].trim() };
+          }
+          // Fallback: try to extract number from start
+          const numMatch = line.match(/^(\d+)\.\s*(.+?)\s*[—–-]\s*(.+)$/);
+          if (numMatch) {
+            return { number: parseInt(numMatch[1]), title: numMatch[2].trim(), summary: numMatch[3].trim() };
+          }
+          return null;
+        })
+        .filter(Boolean);
+
+      return new Response(JSON.stringify({ ...parsed, chapters }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
