@@ -6,75 +6,21 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-interface TOCEntry {
-  title: string;
-  level?: number;
-}
-
-async function fetchEditionTOC(editionKey: string): Promise<TOCEntry[]> {
-  try {
-    const resp = await fetch(`https://openlibrary.org/books/${editionKey}.json`);
-    if (!resp.ok) return [];
-    const data = await resp.json();
-    const toc = data.table_of_contents;
-    if (!Array.isArray(toc) || toc.length === 0) return [];
-    return toc
-      .filter((entry: any) => entry.title && entry.title.trim())
-      .map((entry: any) => ({
-        title: entry.title.trim(),
-        level: entry.level ?? 0,
-      }));
-  } catch {
-    return [];
-  }
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { title, author, editionKey } = await req.json();
+    const { title, author } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Try to fetch real chapter data from Open Library
-    let realChapters: TOCEntry[] = [];
-    if (editionKey) {
-      realChapters = await fetchEditionTOC(editionKey);
-      console.log(`Fetched ${realChapters.length} TOC entries for edition ${editionKey}`);
-    }
-
-    const hasRealChapters = realChapters.length > 0;
-
-    // Build the system prompt based on whether we have real chapters
-    let systemPrompt: string;
-    let userPrompt: string;
-
-    if (hasRealChapters) {
-      const chapterList = realChapters.map((ch, i) => `${i + 1}. ${ch.title}`).join("\n");
-
-      systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
+    const systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
 1. A concise summary (2-3 paragraphs)
 2. 5-7 key learnings/takeaways as an array
-3. For EACH chapter listed below, write a 2-3 sentence summary. Use the exact chapter titles provided. Do NOT skip any chapters.
 
 Only respond with the JSON via the tool call, no other text.`;
 
-      userPrompt = `Real chapters from the book:
-${chapterList}`;
-    } else {
-      systemPrompt = `You are a book expert. For the book ${title} by ${author}, can you provide:
-1. A concise summary (2-3 paragraphs)
-2. 5-7 key learnings/takeaways as an array
-3. A list of chapters. For each chapter include the title and a brief summary (2-3 sentences).
-
-Only respond with the JSON via the tool call, no other text.`;
-
-      userPrompt = `You are a book expert. For the book ${title} by ${author}, can you provide:
-1. A concise summary (2-3 paragraphs)
-2. 5-7 key learnings/takeaways as an array
-3. A list of chapters. For each chapter include the title and a brief summary (2-3 sentences).`;
-    }
+    const userPrompt = `Generate the summary and key takeaways for "${title}" by ${author}.`;
 
     const model = "openai/gpt-5.2";
 
@@ -105,13 +51,8 @@ Only respond with the JSON via the tool call, no other text.`;
                     items: { type: "string" },
                     description: "5-7 key takeaways from the book",
                   },
-                  chapters: {
-                    type: "string",
-                    description:
-                      "Complete chapter-by-chapter breakdown. Format each chapter on its own line as: 'Chapter NUMBER: TITLE — SUMMARY'. Use a newline between each chapter. Include ALL chapters.",
-                  },
                 },
-                required: ["summary", "key_learnings", "chapters"],
+                required: ["summary", "key_learnings"],
                 additionalProperties: false,
               },
             },
@@ -144,26 +85,7 @@ Only respond with the JSON via the tool call, no other text.`;
 
     if (toolCall?.function?.arguments) {
       const parsed = JSON.parse(toolCall.function.arguments);
-      // Parse the chapters text block into structured array
-      const chaptersText: string = parsed.chapters || "";
-      const chapters = chaptersText
-        .split("\n")
-        .filter((line: string) => line.trim())
-        .map((line: string) => {
-          const match = line.match(/^Chapter\s+(\d+)\s*:\s*(.+?)\s*[—–-]\s*(.+)$/i);
-          if (match) {
-            return { number: parseInt(match[1]), title: match[2].trim(), summary: match[3].trim() };
-          }
-          // Fallback: try to extract number from start
-          const numMatch = line.match(/^(\d+)\.\s*(.+?)\s*[—–-]\s*(.+)$/);
-          if (numMatch) {
-            return { number: parseInt(numMatch[1]), title: numMatch[2].trim(), summary: numMatch[3].trim() };
-          }
-          return null;
-        })
-        .filter(Boolean);
-
-      return new Response(JSON.stringify({ ...parsed, chapters }), {
+      return new Response(JSON.stringify(parsed), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
