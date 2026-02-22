@@ -2,8 +2,13 @@ import { useState, useEffect } from "react";
 import bookmindLogo from "@/assets/bookmind-logo.png";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, BookOpen, Loader2, Save, PenLine } from "lucide-react";
-import { fetchBooks, updateBookNotes } from "@/lib/api";
+import { ArrowLeft, BookOpen, Loader2, Save, PenLine, Trash2 } from "lucide-react";
+import { fetchBooks, updateBookNotes, deleteBook } from "@/lib/api";
+import { useNavigate } from "react-router-dom";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { getCoverUrl } from "@/lib/openLibrary";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +19,17 @@ const BookDetail = () => {
   const { id } = useParams<{id: string;}>();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteBook(id!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["books"] });
+      toast({ title: "Book deleted" });
+      navigate("/library");
+    },
+    onError: (e) => toast({ title: "Error deleting book", description: e.message, variant: "destructive" }),
+  });
 
   const { data: books = [], isLoading } = useQuery({
     queryKey: ["books"],
@@ -60,14 +76,34 @@ const BookDetail = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="px-4 py-3 sm:px-6">
-        <div className="mx-auto flex max-w-lg md:max-w-3xl lg:max-w-4xl items-center gap-3">
+        <div className="mx-auto flex max-w-lg md:max-w-3xl lg:max-w-4xl items-center justify-between">
           <Link to="/library" className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary">
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <div className="flex items-center gap-2">
-            
-            
-          </div>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive">
+                <Trash2 className="h-4.5 w-4.5" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete this book?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently remove "{book?.title}" and all its data.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => deleteMutation.mutate()}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </header>
 
