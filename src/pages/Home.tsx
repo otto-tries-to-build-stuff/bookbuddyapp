@@ -53,7 +53,7 @@ const Home = () => {
         <Button asChild size="lg" variant="secondary" className="h-14 text-lg">
           <Link to="/chat">
             <MessageCircle className="mr-2 h-5 w-5" />
-            Chat
+            Chat with your books
           </Link>
         </Button>
       </div>
