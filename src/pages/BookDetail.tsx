@@ -61,7 +61,7 @@ const BookDetail = () => {
       {/* Header */}
       <header className="px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-lg md:max-w-3xl lg:max-w-4xl items-center gap-3">
-          <Link to="/" className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary">
+          <Link to="/library" className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="flex items-center gap-2">
