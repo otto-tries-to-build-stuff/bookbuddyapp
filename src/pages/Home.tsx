@@ -1,29 +1,16 @@
-import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BookOpen, MessageCircle, User } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { fetchProfile } from "@/lib/api";
-import homescreenThinking from "@/assets/homescreen-thinking.png";
 import homescreenBook from "@/assets/homescreen-book.png";
 
-const images = [homescreenThinking, homescreenBook];
-
 const Home = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
-
   const { data: profile } = useQuery({
     queryKey: ["profile"],
     queryFn: fetchProfile,
   });
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % images.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center bg-background px-6">
@@ -38,17 +25,13 @@ const Home = () => {
           </AvatarFallback>
         </Avatar>
       </Link>
-      {/* Animated image */}
-      <div className="relative mb-8 h-48 w-48 sm:h-56 sm:w-56">
-        {images.map((src, i) => (
-          <img
-            key={i}
-            src={src}
-            alt=""
-            className="absolute inset-0 h-full w-full object-contain transition-opacity duration-700 ease-in-out"
-            style={{ opacity: activeIndex === i ? 1 : 0 }}
-          />
-        ))}
+      {/* Book image */}
+      <div className="mb-8 h-48 w-48 sm:h-56 sm:w-56">
+        <img
+          src={homescreenBook}
+          alt="Book"
+          className="h-full w-full object-contain"
+        />
       </div>
 
       {/* Title */}
