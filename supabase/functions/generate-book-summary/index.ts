@@ -99,7 +99,7 @@ serve(async (req) => {
             model,
             temperature: 0,
             messages: [
-              { role: "system", content: "Using Google Books, list the official table of contents for "${title}" by ${author}." },
+              { role: "system", content: `List the official table of contents for "${title}" by ${author}. Output one chapter per line, no commentary.` },
               { role: "user", content: `List the official table of contents for "${title}" by ${author}.` },
             ],
           }),
