@@ -45,12 +45,14 @@ serve(async (req) => {
     const handleAIError = async (response: Response) => {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded, please try again later." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "AI credits exhausted. Please add funds." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const t = await response.text();
@@ -66,25 +68,34 @@ serve(async (req) => {
         model,
         temperature: 0,
         messages: [
-          { role: "system", content: `You are a book expert. For the book "${title}" by ${author}, provide a concise summary (2-3 paragraphs) and 5-7 key learnings/takeaways. Only respond via the tool call.` },
+          {
+            role: "system",
+            content: `You are a book expert. For the book "${title}" by ${author}, provide a concise summary (2-3 paragraphs) and 5-7 key learnings/takeaways. Only respond via the tool call.`,
+          },
           { role: "user", content: `Generate the summary and key takeaways for "${title}" by ${author}.` },
         ],
-        tools: [{
-          type: "function",
-          function: {
-            name: "book_summary",
-            description: "Return a book summary and key learnings",
-            parameters: {
-              type: "object",
-              properties: {
-                summary: { type: "string", description: "A 2-3 paragraph summary of the book" },
-                key_learnings: { type: "array", items: { type: "string" }, description: "5-7 key takeaways from the book" },
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "book_summary",
+              description: "Return a book summary and key learnings",
+              parameters: {
+                type: "object",
+                properties: {
+                  summary: { type: "string", description: "A 2-3 paragraph summary of the book" },
+                  key_learnings: {
+                    type: "array",
+                    items: { type: "string" },
+                    description: "5-7 key takeaways from the book",
+                  },
+                },
+                required: ["summary", "key_learnings"],
+                additionalProperties: false,
               },
-              required: ["summary", "key_learnings"],
-              additionalProperties: false,
             },
           },
-        }],
+        ],
         tool_choice: { type: "function", function: { name: "book_summary" } },
       }),
     });
@@ -99,7 +110,12 @@ serve(async (req) => {
             model,
             temperature: 0,
             messages: [
-              { role: "system", content: `List the official table of contents for "${title}" by ${author}. Output one chapter per line, no commentary.` },
+              {
+                role: "system",
+                content: `List the official table of contents for "${title}" by ${author}. - You MUST use the officially published table of contents from the latest edition.
+- Do NOT reconstruct from memory.
+- Do NOT infer structure based on other books by the author.`,
+              },
               { role: "user", content: `List the official table of contents for "${title}" by ${author}.` },
             ],
           }),
@@ -136,7 +152,10 @@ serve(async (req) => {
     } else if (pass2Response) {
       const pass2Data = await pass2Response.json();
       const tocText = pass2Data.choices?.[0]?.message?.content || "";
-      toc = tocText.split("\n").map((l: string) => l.trim()).filter(Boolean);
+      toc = tocText
+        .split("\n")
+        .map((l: string) => l.trim())
+        .filter(Boolean);
     } else {
       toc = [];
     }
