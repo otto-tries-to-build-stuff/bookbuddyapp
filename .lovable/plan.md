@@ -1,34 +1,20 @@
 
 
-# Render Table of Contents as Plain Text
+# Fix Broken String Interpolation in Pass 2 System Prompt
 
-## Overview
-Replace the numbered list (with circled numbers) in the Table of Contents section with a simple plain text block. The AI response will be displayed as-is, preserving any natural formatting (numbering, parts, sections) the model includes.
+## Problem
+Line 102 in `generate-book-summary/index.ts` uses a regular string with curly quotation marks instead of a template literal with backticks. This means `${title}` and `${author}` are sent as literal text to the AI, not the actual values.
 
-## Changes
+## Fix
+Change line 102 from a regular string to a template literal (backticks), matching the style used everywhere else in the file:
 
-**File: `src/pages/BookDetail.tsx`**
-
-Replace the current `<ol>` with numbered circle badges:
 ```
-<ol className="space-y-2">
-  {book.table_of_contents.map((chapter, i) => (
-    <li key={i} className="flex gap-3">
-      <span className="...rounded-full...">{i + 1}</span>
-      <span>...</span>
-    </li>
-  ))}
-</ol>
+// Before (broken — regular string, no interpolation):
+{ role: "system", content: "Using Google Books, list the official table of contents for \u201C${title}\u201D by ${author}." },
+
+// After (fixed — template literal, variables interpolated):
+{ role: "system", content: `List the official table of contents for "${title}" by ${author}. Output one chapter per line, no commentary.` },
 ```
 
-With a simple pre-formatted text block (same style as the Summary section):
-```
-<p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-  {book.table_of_contents.join("\n")}
-</p>
-```
-
-This joins the array back into a newline-separated string and renders it exactly as the AI returned it -- no extra numbering or styling added by the UI.
-
-No backend or prompt changes required.
+This is a one-line fix in `supabase/functions/generate-book-summary/index.ts`. The edge function will be redeployed after the change.
 
