@@ -6,23 +6,75 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+async function fetchEditionTOC(editionKey: string): Promise<string[]> {
+  try {
+    const resp = await fetch(`https://openlibrary.org/books/${editionKey}.json`);
+    if (!resp.ok) return [];
+    const data = await resp.json();
+    const toc = data.table_of_contents;
+    if (!Array.isArray(toc) || toc.length === 0) return [];
+    return toc
+      .filter((entry: any) => entry.title && entry.title.trim())
+      .map((entry: any) => entry.title.trim());
+  } catch {
+    return [];
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { title, author } = await req.json();
+    const { title, author, editionKey } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
+    // Try to fetch real TOC from Open Library
+    let realTOC: string[] = [];
+    if (editionKey) {
+      realTOC = await fetchEditionTOC(editionKey);
+      console.log(`Fetched ${realTOC.length} TOC entries for edition ${editionKey}`);
+    }
+
+    const hasRealTOC = realTOC.length > 0;
+
+    let systemPrompt: string;
+    let userPrompt: string;
+
+    if (hasRealTOC) {
+      systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
 1. A concise summary (2-3 paragraphs)
 2. 5-7 key learnings/takeaways as an array
 
+The table of contents has already been provided — do NOT generate one. Only respond with the JSON via the tool call, no other text.`;
+
+      userPrompt = `Generate the summary and key takeaways for "${title}" by ${author}.`;
+    } else {
+      systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
+1. A concise summary (2-3 paragraphs)
+2. 5-7 key learnings/takeaways as an array
+3. A complete table of contents listing every chapter title
+
 Only respond with the JSON via the tool call, no other text.`;
 
-    const userPrompt = `Generate the summary and key takeaways for "${title}" by ${author}.`;
+      userPrompt = `Generate the summary, key takeaways, and table of contents for "${title}" by ${author}.`;
+    }
 
     const model = "openai/gpt-5.2";
+
+    const tocProperty = hasRealTOC
+      ? {}
+      : {
+          table_of_contents: {
+            type: "array",
+            items: { type: "string" },
+            description: "Complete list of chapter titles in order",
+          },
+        };
+
+    const requiredFields = hasRealTOC
+      ? ["summary", "key_learnings"]
+      : ["summary", "key_learnings", "table_of_contents"];
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -51,8 +103,9 @@ Only respond with the JSON via the tool call, no other text.`;
                     items: { type: "string" },
                     description: "5-7 key takeaways from the book",
                   },
+                  ...tocProperty,
                 },
-                required: ["summary", "key_learnings"],
+                required: requiredFields,
                 additionalProperties: false,
               },
             },
@@ -85,7 +138,9 @@ Only respond with the JSON via the tool call, no other text.`;
 
     if (toolCall?.function?.arguments) {
       const parsed = JSON.parse(toolCall.function.arguments);
-      return new Response(JSON.stringify(parsed), {
+      // Use real TOC if available, otherwise use AI-generated one
+      const toc = hasRealTOC ? realTOC : (parsed.table_of_contents || []);
+      return new Response(JSON.stringify({ ...parsed, table_of_contents: toc }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -94,8 +149,9 @@ Only respond with the JSON via the tool call, no other text.`;
     const content = data.choices?.[0]?.message?.content || "";
     const cleaned = content.replace(/```json\n?|\n?```/g, "").trim();
     const parsed = JSON.parse(cleaned);
+    const toc = hasRealTOC ? realTOC : (parsed.table_of_contents || []);
 
-    return new Response(JSON.stringify(parsed), {
+    return new Response(JSON.stringify({ ...parsed, table_of_contents: toc }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
