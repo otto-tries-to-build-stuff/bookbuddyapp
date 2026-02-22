@@ -158,16 +158,9 @@ const BookDetail = () => {
             {book.table_of_contents.length > 0 &&
           <section>
                 <h2 className="mb-3 text-xl font-sans">Table of Contents</h2>
-                <ol className="space-y-2">
-                  {book.table_of_contents.map((chapter, i) =>
-              <li key={i} className="flex gap-3">
-                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-medium text-accent">
-                        {i + 1}
-                      </span>
-                      <span className="text-sm leading-relaxed text-muted-foreground">{chapter}</span>
-                    </li>
-              )}
-                </ol>
+                <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                  {book.table_of_contents.join("\n")}
+                </p>
               </section>
           }
 
