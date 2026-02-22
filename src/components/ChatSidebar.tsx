@@ -191,7 +191,7 @@ function ChatItem({
     <div
       onClick={onSelect}
       className={cn(
-        "group flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
+        "group relative flex items-center gap-2 rounded-md px-3 py-2 pr-8 text-sm transition-colors",
         tab === "history" && "cursor-pointer",
         isActive ? "bg-accent/10 text-accent" : "text-foreground hover:bg-secondary"
       )}
@@ -224,7 +224,7 @@ function ChatItem({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-          <button className="shrink-0 rounded p-1 mr-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-secondary transition-opacity ml-auto">
+          <button className="absolute right-1 top-1/2 -translate-y-1/2 shrink-0 rounded p-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-secondary transition-opacity">
             <MoreHorizontal className="h-4 w-4" />
           </button>
         </DropdownMenuTrigger>
