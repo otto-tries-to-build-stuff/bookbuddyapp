@@ -65,7 +65,7 @@ const BookDetail = () => {
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="flex items-center gap-2">
-            <img alt="BookMind" className="h-5 w-5" src="/lovable-uploads/8c53ea5c-3326-47b6-8dea-bab692fb49b0.png" />
+            
             <span className="text-sm text-muted-foreground">BookBuddy</span>
           </div>
         </div>
