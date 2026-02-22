@@ -69,7 +69,7 @@ const Index = () => {
       <header className="px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-lg md:max-w-3xl lg:max-w-5xl items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <img alt="BookMind" className="h-6 w-6" src="/lovable-uploads/d4eea19e-ecff-4fd0-bb36-63131f40c4f8.png" />
+            <img alt="BookBuddy" className="h-6 w-6" src="/lovable-uploads/d4eea19e-ecff-4fd0-bb36-63131f40c4f8.png" />
             <span className="text-sm font-medium text-foreground">BookBuddy</span>
           </Link>
           <div className="flex items-center gap-1">
