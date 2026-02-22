@@ -190,7 +190,7 @@ const Chat = () => {
             </Link>
             <div className="flex items-center gap-2">
               
-              <h1 className="text-xl">Chat with your books</h1>
+              <h1 className="text-xl font-sans font-semibold bg-inherit">Chat with your books</h1>
             </div>
           </div>
         </header>
