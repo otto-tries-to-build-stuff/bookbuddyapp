@@ -9,7 +9,7 @@ import homescreenBook from "@/assets/homescreen-book.png";
 const Home = () => {
   const { data: profile } = useQuery({
     queryKey: ["profile"],
-    queryFn: fetchProfile,
+    queryFn: fetchProfile
   });
 
   return (
@@ -17,9 +17,9 @@ const Home = () => {
       {/* Profile avatar */}
       <Link to="/profile" className="absolute right-4 top-4">
         <Avatar className="h-9 w-9 border border-border">
-          {profile?.avatar_url ? (
-            <AvatarImage src={profile.avatar_url} alt="Profile" />
-          ) : null}
+          {profile?.avatar_url ?
+          <AvatarImage src={profile.avatar_url} alt="Profile" /> :
+          null}
           <AvatarFallback className="bg-secondary text-muted-foreground">
             <User className="h-4 w-4" />
           </AvatarFallback>
@@ -30,12 +30,12 @@ const Home = () => {
         <img
           src={homescreenBook}
           alt="Book"
-          className="h-full w-full object-contain"
-        />
+          className="h-full w-full object-contain" />
+
       </div>
 
       {/* Title */}
-      <h1 className="mb-2 text-4xl font-bold text-foreground sm:text-5xl">
+      <h1 className="mb-2 text-4xl font-bold text-foreground sm:text-5xl font-sans">
         BookBuddy
       </h1>
       <p className="mb-10 text-center text-muted-foreground">
@@ -57,8 +57,8 @@ const Home = () => {
           </Link>
         </Button>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Home;
