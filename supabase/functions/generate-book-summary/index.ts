@@ -2,7 +2,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 interface TOCEntry {
@@ -50,9 +51,7 @@ serve(async (req) => {
     let userPrompt: string;
 
     if (hasRealChapters) {
-      const chapterList = realChapters
-        .map((ch, i) => `${i + 1}. ${ch.title}`)
-        .join("\n");
+      const chapterList = realChapters.map((ch, i) => `${i + 1}. ${ch.title}`).join("\n");
 
       systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
 1. A concise summary (2-3 paragraphs)
@@ -64,14 +63,12 @@ Only respond with the JSON via the tool call, no other text.`;
       userPrompt = `Real chapters from the book:
 ${chapterList}`;
     } else {
-      systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
+      systemPrompt = `You are a book expert. For the book "${title}" by ${author}, can you provide:
 1. A concise summary (2-3 paragraphs)
 2. 5-7 key learnings/takeaways as an array
 3. A COMPLETE chapter-by-chapter breakdown. You MUST include ALL chapters — do NOT skip any. Double-check that every chapter is listed. Each chapter needs its number, title, and a brief summary (2-3 sentences).
 
 Only respond with the JSON via the tool call, no other text.`;
-
-      userPrompt = `Generate the complete summary and chapter breakdown for this book.`;
     }
 
     const model = "openai/gpt-5.2";
@@ -147,7 +144,7 @@ Only respond with the JSON via the tool call, no other text.`;
 
     const data = await response.json();
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-    
+
     if (toolCall?.function?.arguments) {
       const parsed = JSON.parse(toolCall.function.arguments);
       return new Response(JSON.stringify(parsed), {
