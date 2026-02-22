@@ -196,7 +196,7 @@ function BookCard({ book, onDelete }: {book: Book;onDelete: () => void;}) {
 
         {/* Text */}
         <div className="flex min-w-0 flex-1 flex-col justify-center py-0.5">
-          <h3 className="truncate text-base font-medium leading-snug text-foreground">
+          <h3 className="truncate text-base font-medium leading-snug text-foreground font-sans">
             {book.title}
           </h3>
           <p className="mt-0.5 text-xs text-muted-foreground">{book.author}</p>
