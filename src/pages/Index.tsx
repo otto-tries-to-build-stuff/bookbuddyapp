@@ -137,7 +137,7 @@ const Index = () => {
       {/* Greeting */}
       <main className="mx-auto max-w-lg md:max-w-3xl lg:max-w-5xl px-4 pb-10 sm:px-6">
         <div className="mb-6 mt-4">
-          <h1 className="text-3xl sm:text-4xl font-sans font-medium">Your library</h1>
+          <h1 className="text-3xl sm:text-4xl font-sans font-medium">What are you reading?</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {books.length} {books.length === 1 ? "book" : "books"} in your collection
           </p>
