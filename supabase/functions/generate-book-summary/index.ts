@@ -76,10 +76,7 @@ Only respond with the JSON via the tool call, no other text.`;
       userPrompt = `Book: "${title}" by ${author}`;
     }
 
-    // Use gemini-2.5-pro for fallback (better accuracy), flash for guided chapters
-    const model = hasRealChapters
-      ? "google/gemini-3-flash-preview"
-      : "google/gemini-2.5-pro";
+    const model = "openai/gpt-5.2";
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
