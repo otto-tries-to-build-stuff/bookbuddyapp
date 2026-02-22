@@ -2,7 +2,7 @@ import { useState } from "react";
 import bookmindLogo from "@/assets/bookmind-logo.png";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { Plus, BookOpen, MessageCircle, Trash2, Loader2, User } from "lucide-react";
+import { Plus, BookOpen, MessageCircle, Trash2, Loader2, ArrowLeft } from "lucide-react";
 import { BookSearchInput } from "@/components/BookSearchInput";
 import type { OpenLibraryBook } from "@/lib/openLibrary";
 import { getCoverUrl } from "@/lib/openLibrary";
@@ -68,16 +68,12 @@ const Index = () => {
       {/* Top bar */}
       <header className="px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-lg md:max-w-3xl lg:max-w-5xl items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <img alt="BookBuddy" className="h-6 w-6" src="/lovable-uploads/d4eea19e-ecff-4fd0-bb36-63131f40c4f8.png" />
-            <span className="text-sm font-medium text-foreground">BookBuddy</span>
+          <Link
+            to="/"
+            className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary">
+            <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="flex items-center gap-1">
-            <Link to="/profile">
-              <Button variant="ghost" size="icon" className="h-9 w-9">
-                <User className="h-4 w-4" />
-              </Button>
-            </Link>
             <Link to="/chat">
               <Button variant="ghost" size="icon" className="h-9 w-9">
                 <MessageCircle className="h-4 w-4" />

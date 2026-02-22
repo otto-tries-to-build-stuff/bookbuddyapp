@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, MessageCircle } from "lucide-react";
+import { BookOpen, MessageCircle, User } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { fetchProfile } from "@/lib/api";
 import homescreenThinking from "@/assets/homescreen-thinking.png";
 import homescreenBook from "@/assets/homescreen-book.png";
 
@@ -9,6 +12,11 @@ const images = [homescreenThinking, homescreenBook];
 
 const Home = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: fetchProfile,
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -18,7 +26,18 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6">
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-background px-6">
+      {/* Profile avatar */}
+      <Link to="/profile" className="absolute right-4 top-4">
+        <Avatar className="h-9 w-9 border border-border">
+          {profile?.avatar_url ? (
+            <AvatarImage src={profile.avatar_url} alt="Profile" />
+          ) : null}
+          <AvatarFallback className="bg-secondary text-muted-foreground">
+            <User className="h-4 w-4" />
+          </AvatarFallback>
+        </Avatar>
+      </Link>
       {/* Animated image */}
       <div className="relative mb-8 h-48 w-48 sm:h-56 sm:w-56">
         {images.map((src, i) => (
