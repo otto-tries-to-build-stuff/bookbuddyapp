@@ -139,7 +139,7 @@ const Index = () => {
         <div className="mb-6 mt-4">
           <h1 className="text-3xl sm:text-4xl font-sans font-medium">What are you reading?</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {books.length} {books.length === 1 ? "book" : "books"} in your collection
+            {books.length} {books.length === 1 ? "book" : "books"} in your library
           </p>
         </div>
 
