@@ -201,7 +201,7 @@ const Chat = () => {
           <div className="mx-auto max-w-3xl px-6 py-6">
             {!hasStartedChat &&
             <div className="flex flex-col items-center justify-center py-12 text-center">
-                <img src={chatIcon} alt="Chat with books" className="mb-4 h-32 w-32" />
+                <img alt="Chat with books" className="mb-4 h-32 w-32" src="/lovable-uploads/5cc5737f-690e-41df-af95-5d7f4c51d9fc.png" />
                 <p className="text-lg text-muted-foreground">Select books for context, then ask away</p>
                 <p className="mt-1 mb-6 text-sm text-muted-foreground/60">
                   e.g. "What are the main ideas from Atomic Habits?"
