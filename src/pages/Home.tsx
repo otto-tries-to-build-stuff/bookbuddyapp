@@ -39,7 +39,8 @@ const Home = () => {
         BookBuddy
       </h1>
       <p className="mb-10 text-center text-muted-foreground">
-        Stop forgetting what you've learn with your AI-powered reading companion
+        
+Your AI-powered reading companion
       </p>
 
       {/* Navigation buttons */}
@@ -58,7 +59,6 @@ const Home = () => {
         </Button>
       </div>
     </div>);
-
 };
 
 export default Home;
