@@ -290,7 +290,7 @@ const Chat = () => {
         <div className="shrink-0 border-t border-border bg-background">
           <div className="mx-auto flex max-w-3xl items-end gap-3 px-6 py-4">
             <Textarea
-              placeholder="Ask about your books…"
+              placeholder="Ask your books a question…"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
