@@ -1,37 +1,39 @@
 
-## Add Tooltips for Chat Titles and Widen Mobile Sidebar
 
-### What Changes
+## Fix Chat Title Truncation, 3-Dot Menu, and Tooltip Positioning
 
-**Desktop**: Hovering over any chat title shows the full name in a tooltip. No more hard 20-character JS truncation -- CSS handles the ellipsis naturally.
+### Root Causes
 
-**Mobile/Tablet**: The sidebar sheet widens from `w-72` (288px) to `w-80` (320px), giving titles more breathing room alongside the CSS-based truncation.
+1. **No truncation**: The Radix `TooltipTrigger` with `asChild` merges onto the `<span>`, but it needs explicit `overflow-hidden` constraints. The `min-w-0 flex-1 truncate` classes on the span should work, but the Tooltip wrapper div may be breaking the flex layout.
 
-### Technical Details
+2. **3-dot menu disappearing**: Because the title text isn't truncating, it overflows past the `pr-8` reserved space, visually covering/pushing the absolutely-positioned menu button.
+
+3. **Tooltip too far away**: `side="right"` positions the tooltip to the right edge of the sidebar container rather than near the text.
+
+### Fixes
 
 **File: `src/components/ChatSidebar.tsx`**
 
-1. Add import for Tooltip components:
+1. **Fix truncation**: Wrap the `Tooltip` in a `div` or ensure the TooltipTrigger span has proper overflow constraints. Add `overflow-hidden` and `min-w-0` to a wrapper around the Tooltip so the flex item properly shrinks:
+   ```tsx
+   <div className="min-w-0 flex-1">
+     <Tooltip>
+       <TooltipTrigger asChild>
+         <span className="block truncate">{chat.title}</span>
+       </TooltipTrigger>
+       <TooltipContent side="bottom" className="max-w-[200px] break-words">
+         {chat.title}
+       </TooltipContent>
+     </Tooltip>
+   </div>
    ```
-   import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
-   ```
+   - The outer `div` with `min-w-0 flex-1` becomes the flex child that shrinks
+   - The inner `span` with `block truncate` handles the text ellipsis
+   - This ensures the title stays within bounds and the `pr-8` space is preserved for the 3-dot menu
 
-2. Wrap the `ScrollArea` content in a `<TooltipProvider delayDuration={300}>` to prevent tooltip flicker during scrolling.
+2. **Fix tooltip position**: Change `side="right"` to `side="bottom"` so the tooltip appears directly below the title text rather than far to the right of the sidebar.
 
-3. In the `ChatItem` component, replace the title `<span>` (line 220-222) with a Tooltip wrapper:
-   - Remove the JS `.slice(0, 20)` truncation
-   - Keep the CSS `truncate` class so the browser handles ellipsis based on available width
-   - Wrap in `Tooltip` + `TooltipTrigger` + `TooltipContent` showing `chat.title`
-   - Radix Tooltips gracefully do nothing on touch devices, so no accidental popups on mobile
-
-**File: `src/pages/Chat.tsx`**
-
-4. Widen the mobile Sheet from `w-72` to `w-80` (line ~147):
-   ```
-   <SheetContent side="left" className="w-80 p-0 ...">
-   ```
-
-**Summary:**
-- Two files modified: `ChatSidebar.tsx` and `Chat.tsx`
-- No new dependencies (Radix Tooltip already installed)
-- No database or backend changes
+### Summary
+- One file modified: `ChatSidebar.tsx`
+- Fixes all three issues: truncation with "...", visible 3-dot menu, and closer tooltip positioning
+- No new dependencies or backend changes
