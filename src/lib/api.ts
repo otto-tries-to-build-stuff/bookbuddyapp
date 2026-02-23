@@ -1,11 +1,16 @@
 import { supabase } from "@/integrations/supabase/client";
 
+export interface KeyLesson {
+  title: string;
+  detail: string;
+}
+
 export interface Book {
   id: string;
   title: string;
   author: string;
   summary: string | null;
-  key_learnings: string[];
+  key_learnings: KeyLesson[];
   cover_id: number | null;
   notes: string | null;
   created_at: string;
@@ -20,7 +25,7 @@ export async function fetchBooks(): Promise<Book[]> {
   if (error) throw error;
   return (data || []).map((b) => ({
     ...b,
-    key_learnings: Array.isArray(b.key_learnings) ? b.key_learnings as string[] : [],
+    key_learnings: Array.isArray(b.key_learnings) ? (b.key_learnings as unknown as KeyLesson[]) : [],
   }));
 }
 
@@ -54,7 +59,7 @@ export async function addBook(title: string, author: string, coverId?: number | 
       if (!updateError && updated) {
         return {
           ...updated,
-          key_learnings: Array.isArray(updated.key_learnings) ? updated.key_learnings as string[] : [],
+          key_learnings: Array.isArray(updated.key_learnings) ? (updated.key_learnings as unknown as KeyLesson[]) : [],
         };
       }
     }
@@ -64,7 +69,7 @@ export async function addBook(title: string, author: string, coverId?: number | 
 
   return {
     ...book,
-    key_learnings: Array.isArray(book.key_learnings) ? book.key_learnings as string[] : [],
+    key_learnings: Array.isArray(book.key_learnings) ? (book.key_learnings as unknown as KeyLesson[]) : [],
   };
 }
 
