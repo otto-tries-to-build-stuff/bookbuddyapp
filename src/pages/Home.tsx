@@ -28,9 +28,9 @@ const Home = () => {
       {/* Book image */}
       <div className="mb-8 h-48 w-48 sm:h-56 sm:w-56">
         <img
-          src={homescreenBook}
+
           alt="Book"
-          className="h-full w-full object-contain" />
+          className="h-full w-full object-contain" src="/lovable-uploads/56195569-8c38-43f8-bec7-173d30014769.png" />
 
       </div>
 
