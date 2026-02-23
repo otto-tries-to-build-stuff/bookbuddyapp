@@ -1,18 +1,17 @@
 
 
-## Make Key Lessons Count Dynamic
+## Fix "5-7 Key Lessons" Reference in Tool Schema
 
-**Problem:** The prompt currently says "5-7 key lessons," which causes the model to consistently output exactly 7. This feels formulaic regardless of the book.
+**Problem:** While the system prompt was updated to allow a dynamic number of lessons, the tool calling schema still contains `"description": "5-7 key lessons from the book"` on line 56. The model treats the tool schema as a strong constraint, so it continues producing exactly 7 lessons.
 
-**Solution:** Update the system prompt to let the model decide the appropriate number of lessons based on the book's content.
+**Solution:** Update the `description` field of the `key_learnings` property in the tool schema to match the updated prompt.
 
 ### Changes
 
-**File: `supabase/functions/generate-book-summary/index.ts`** (line 19)
-- Change `"5-7 key lessons from the book."` to something like `"The most important key lessons from the book (as many as appropriate based on the book's content and depth)."`
-- This removes the fixed range and lets the model use its judgment
+**File: `supabase/functions/generate-book-summary/index.ts`** (line 56)
+- Change: `"5-7 key lessons from the book"`
+- To: `"The most important key lessons from the book, as many as appropriate"`
 
-This is a single line change in the prompt. The edge function will be redeployed automatically.
+This is a single string change. The edge function will be redeployed automatically.
 
-**Note:** Existing books will keep their current lessons. You'd need to delete and re-add a book (or use a future "regenerate" feature) to see the new dynamic count.
-
+**Note:** Existing books will keep their current 7 lessons. You would need to delete and re-add a book to see the dynamic count in action.
