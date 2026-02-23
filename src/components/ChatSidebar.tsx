@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchChats,
@@ -123,32 +124,34 @@ export default function ChatSidebar({ activeChatId, onSelectChat, onNewChat }: C
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-2 space-y-1">
-          {isLoading ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            </div>
-          ) : sortedItems.length === 0 ? (
-            <p className="px-3 py-8 text-center text-xs text-muted-foreground">
-              {tab === "history" ? "No chats yet" : "Archive is empty"}
-            </p>
-          ) : (
-            sortedItems.map((chat) => (
-              <ChatItem
-                key={chat.id}
-                chat={chat}
-                isActive={chat.id === activeChatId}
-                tab={tab}
-                onSelect={() => tab === "history" && onSelectChat(chat.id)}
-                onArchive={() => archiveMutation.mutate(chat.id)}
-                onRestore={() => restoreMutation.mutate(chat.id)}
-                onDelete={() => deleteMutation.mutate(chat.id)}
-                onTogglePin={() => pinMutation.mutate({ id: chat.id, pinned: !!chat.pinned_at })}
-                onRename={(title) => renameMutation.mutate({ id: chat.id, title })}
-              />
-            ))
-          )}
-        </div>
+        <TooltipProvider delayDuration={300}>
+          <div className="p-2 space-y-1">
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              </div>
+            ) : sortedItems.length === 0 ? (
+              <p className="px-3 py-8 text-center text-xs text-muted-foreground">
+                {tab === "history" ? "No chats yet" : "Archive is empty"}
+              </p>
+            ) : (
+              sortedItems.map((chat) => (
+                <ChatItem
+                  key={chat.id}
+                  chat={chat}
+                  isActive={chat.id === activeChatId}
+                  tab={tab}
+                  onSelect={() => tab === "history" && onSelectChat(chat.id)}
+                  onArchive={() => archiveMutation.mutate(chat.id)}
+                  onRestore={() => restoreMutation.mutate(chat.id)}
+                  onDelete={() => deleteMutation.mutate(chat.id)}
+                  onTogglePin={() => pinMutation.mutate({ id: chat.id, pinned: !!chat.pinned_at })}
+                  onRename={(title) => renameMutation.mutate({ id: chat.id, title })}
+                />
+              ))
+            )}
+          </div>
+        </TooltipProvider>
       </ScrollArea>
     </div>
   );
@@ -217,9 +220,14 @@ function ChatItem({
           autoFocus
         />
       ) : (
-        <span className="min-w-0 flex-1 truncate">
-          {chat.title.length > 20 ? chat.title.slice(0, 20) + "…" : chat.title}
-        </span>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="min-w-0 flex-1 truncate">{chat.title}</span>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="max-w-[200px] break-words">
+            {chat.title}
+          </TooltipContent>
+        </Tooltip>
       )}
 
       <DropdownMenu>
