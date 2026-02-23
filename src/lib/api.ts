@@ -83,6 +83,45 @@ export async function updateBookNotes(id: string, notes: string): Promise<void> 
   if (error) throw error;
 }
 
+export async function updateBookSummary(id: string, summary: string): Promise<void> {
+  const { error } = await supabase.from("books").update({ summary }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function updateBookKeyLearnings(id: string, keyLearnings: KeyLesson[]): Promise<void> {
+  const { error } = await supabase
+    .from("books")
+    .update({ key_learnings: keyLearnings as unknown as any })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function regenerateBookSummary(id: string, title: string, author: string): Promise<Book> {
+  const { data: aiData, error: fnError } = await supabase.functions.invoke(
+    "generate-book-summary",
+    { body: { title, author } }
+  );
+  if (fnError) throw fnError;
+
+  const { data: updated, error: updateError } = await supabase
+    .from("books")
+    .update({
+      summary: aiData.summary,
+      key_learnings: aiData.key_learnings || [],
+    })
+    .eq("id", id)
+    .select()
+    .single();
+  if (updateError) throw updateError;
+
+  return {
+    ...updated,
+    key_learnings: Array.isArray(updated.key_learnings)
+      ? (updated.key_learnings as unknown as KeyLesson[])
+      : [],
+  };
+}
+
 // ── Chat history ──
 
 export interface Chat {
