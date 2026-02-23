@@ -53,7 +53,7 @@ const Index = () => {
       setAuthor("");
       setCoverId(null);
       setEditionKey(null);
-      toast({ title: "Book added!", description: "Your AI-generated summary." });
+      toast({ title: "Book added!", description: "Your AI-generated summary is ready" });
     },
     onError: (e) => toast({ title: "Error", description: e.message, variant: "destructive" })
   });
