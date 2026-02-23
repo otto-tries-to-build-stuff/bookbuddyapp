@@ -1,21 +1,37 @@
 
+## Add Tooltips for Chat Titles and Widen Mobile Sidebar
 
-## Switch Book Summary Model to Gemini 3 Flash Preview
+### What Changes
 
-A single-line change in the edge function to swap the model from `openai/gpt-5.2` to `google/gemini-3-flash-preview`, which should cut summary generation time by 2-4x with negligible quality difference for structured book summaries.
+**Desktop**: Hovering over any chat title shows the full name in a tooltip. No more hard 20-character JS truncation -- CSS handles the ellipsis naturally.
+
+**Mobile/Tablet**: The sidebar sheet widens from `w-72` (288px) to `w-80` (320px), giving titles more breathing room alongside the CSS-based truncation.
 
 ### Technical Details
 
-**File: `supabase/functions/generate-book-summary/index.ts`**
+**File: `src/components/ChatSidebar.tsx`**
 
-Change line 30:
-```
-const model = "openai/gpt-5.2";
-```
-to:
-```
-const model = "google/gemini-3-flash-preview";
-```
+1. Add import for Tooltip components:
+   ```
+   import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
+   ```
 
-No other changes needed -- the rest of the function (tool calling, JSON parsing, error handling) is model-agnostic and works identically with Gemini.
+2. Wrap the `ScrollArea` content in a `<TooltipProvider delayDuration={300}>` to prevent tooltip flicker during scrolling.
 
+3. In the `ChatItem` component, replace the title `<span>` (line 220-222) with a Tooltip wrapper:
+   - Remove the JS `.slice(0, 20)` truncation
+   - Keep the CSS `truncate` class so the browser handles ellipsis based on available width
+   - Wrap in `Tooltip` + `TooltipTrigger` + `TooltipContent` showing `chat.title`
+   - Radix Tooltips gracefully do nothing on touch devices, so no accidental popups on mobile
+
+**File: `src/pages/Chat.tsx`**
+
+4. Widen the mobile Sheet from `w-72` to `w-80` (line ~147):
+   ```
+   <SheetContent side="left" className="w-80 p-0 ...">
+   ```
+
+**Summary:**
+- Two files modified: `ChatSidebar.tsx` and `Chat.tsx`
+- No new dependencies (Radix Tooltip already installed)
+- No database or backend changes
