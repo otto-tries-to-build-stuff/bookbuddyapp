@@ -18,6 +18,7 @@ serve(async (req) => {
 1. A concise summary (2-3 paragraphs)
 2. 5-7 key lessons from the book. Each lesson has a short title and 1-2 paragraphs of supporting detail that explains the lesson in depth.
 
+Do not use any markdown formatting (no asterisks, bold, italics, etc.) in your response.
 Only respond with the JSON via the tool call, no other text.`;
 
     const userPrompt = `Generate the summary and key lessons for "${title}" by ${author}.`;
