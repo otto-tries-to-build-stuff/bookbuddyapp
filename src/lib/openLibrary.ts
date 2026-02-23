@@ -9,7 +9,7 @@ export interface OpenLibraryBook {
 export async function searchOpenLibrary(query: string): Promise<OpenLibraryBook[]> {
   if (!query || query.length < 2) return [];
 
-  const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=8&fields=title,author_name,cover_i,first_publish_year,edition_key`;
+  const url = `https://openlibrary.org/search.json?title=${encodeURIComponent(query)}&limit=8&fields=title,author_name,cover_i,first_publish_year,edition_key`;
   const resp = await fetch(url);
   if (!resp.ok) return [];
 
