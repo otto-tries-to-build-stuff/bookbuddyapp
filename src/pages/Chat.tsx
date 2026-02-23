@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, BookOpen, Send, Loader2, Check, Menu } from "lucide-react";
+import { ArrowLeft, Send, Loader2, Check, Menu } from "lucide-react";
+import chatIcon from "@/assets/chat-icon.png";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -200,7 +201,7 @@ const Chat = () => {
           <div className="mx-auto max-w-3xl px-6 py-6">
             {!hasStartedChat &&
             <div className="flex flex-col items-center justify-center py-12 text-center">
-                <BookOpen className="mb-4 h-12 w-12 text-muted-foreground/30" />
+                <img src={chatIcon} alt="Chat with books" className="mb-4 h-16 w-16" />
                 <p className="text-lg text-muted-foreground">Select books for context, then ask away</p>
                 <p className="mt-1 mb-6 text-sm text-muted-foreground/60">
                   e.g. "What are the main ideas from Atomic Habits?"
