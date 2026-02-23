@@ -1,17 +1,18 @@
 
 
-## Remove Markdown Formatting from Book Summaries
+## Make Key Lessons Count Dynamic
 
-**Problem:** The AI model wraps book titles in asterisks (e.g., `*Atomic Habits*`) within the summary text. Since the summary is rendered as plain text, the asterisks show up literally.
+**Problem:** The prompt currently says "5-7 key lessons," which causes the model to consistently output exactly 7. This feels formulaic regardless of the book.
 
-**Solution:** Add an instruction to the system prompt telling the model not to use any markdown formatting in its output. This is the cleanest fix since the summary is displayed as plain text.
+**Solution:** Update the system prompt to let the model decide the appropriate number of lessons based on the book's content.
 
 ### Changes
 
-**File: `supabase/functions/generate-book-summary/index.ts`**
-- Add "Do not use any markdown formatting (no asterisks, bold, italics, etc.) in your response." to the system prompt
+**File: `supabase/functions/generate-book-summary/index.ts`** (line 19)
+- Change `"5-7 key lessons from the book."` to something like `"The most important key lessons from the book (as many as appropriate based on the book's content and depth)."`
+- This removes the fixed range and lets the model use its judgment
 
-This is a one-line addition to the prompt. The edge function will be redeployed automatically.
+This is a single line change in the prompt. The edge function will be redeployed automatically.
 
-**Note:** Existing book summaries that already contain asterisks will remain unchanged. You would need to delete and re-add those books to get clean summaries.
+**Note:** Existing books will keep their current lessons. You'd need to delete and re-add a book (or use a future "regenerate" feature) to see the new dynamic count.
 
