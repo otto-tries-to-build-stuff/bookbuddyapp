@@ -38,9 +38,11 @@ const Home = () => {
       <h1 className="mb-2 text-4xl font-bold text-foreground sm:text-5xl font-sans">
         BookBuddy
       </h1>
-      <p className="mb-10 text-center text-muted-foreground">
-        
-Your AI-powered reading companion
+      <p className="mb-2 text-center text-muted-foreground">
+        Your AI-powered reading companion
+      </p>
+      <p className="mb-10 text-center text-sm text-muted-foreground/70 italic">
+        Stop forgetting what you've learnt
       </p>
 
       {/* Navigation buttons */}
