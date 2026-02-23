@@ -9,7 +9,7 @@ export interface OpenLibraryBook {
 export async function searchOpenLibrary(query: string): Promise<OpenLibraryBook[]> {
   if (!query || query.length < 2) return [];
 
-  const url = `https://openlibrary.org/search.json?title=${encodeURIComponent(query)}&limit=30&fields=title,author_name,cover_i,first_publish_year,edition_key`;
+  const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=60&fields=title,author_name,cover_i,first_publish_year,edition_key`;
   const resp = await fetch(url);
   if (!resp.ok) return [];
 
@@ -36,7 +36,7 @@ export async function searchOpenLibrary(query: string): Promise<OpenLibraryBook[
     return score(a.title) - score(b.title);
   });
 
-  return books.slice(0, 20);
+  return books.slice(0, 50);
 }
 
 export function getCoverUrl(coverId: number | null, size: "S" | "M" | "L" = "S"): string | null {
