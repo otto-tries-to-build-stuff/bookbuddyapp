@@ -1,39 +1,24 @@
 
+## Make the 3-Dot Menu Always Visible
 
-## Fix Chat Title Truncation, 3-Dot Menu, and Tooltip Positioning
+### What Changes
 
-### Root Causes
+The chat item's 3-dot menu button will always be visible instead of only appearing on hover. This makes it accessible on all devices including touch/mobile.
 
-1. **No truncation**: The Radix `TooltipTrigger` with `asChild` merges onto the `<span>`, but it needs explicit `overflow-hidden` constraints. The `min-w-0 flex-1 truncate` classes on the span should work, but the Tooltip wrapper div may be breaking the flex layout.
+### Technical Details
 
-2. **3-dot menu disappearing**: Because the title text isn't truncating, it overflows past the `pr-8` reserved space, visually covering/pushing the absolutely-positioned menu button.
+**File: `src/components/ChatSidebar.tsx` (line 237)**
 
-3. **Tooltip too far away**: `side="right"` positions the tooltip to the right edge of the sidebar container rather than near the text.
+Remove `opacity-0 group-hover:opacity-100 transition-opacity` from the menu button's class list so it is always rendered at full opacity.
 
-### Fixes
+Before:
+```
+className="absolute right-1 top-1/2 -translate-y-1/2 shrink-0 rounded p-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-secondary transition-opacity"
+```
 
-**File: `src/components/ChatSidebar.tsx`**
+After:
+```
+className="absolute right-1 top-1/2 -translate-y-1/2 shrink-0 rounded p-1 text-muted-foreground hover:bg-secondary"
+```
 
-1. **Fix truncation**: Wrap the `Tooltip` in a `div` or ensure the TooltipTrigger span has proper overflow constraints. Add `overflow-hidden` and `min-w-0` to a wrapper around the Tooltip so the flex item properly shrinks:
-   ```tsx
-   <div className="min-w-0 flex-1">
-     <Tooltip>
-       <TooltipTrigger asChild>
-         <span className="block truncate">{chat.title}</span>
-       </TooltipTrigger>
-       <TooltipContent side="bottom" className="max-w-[200px] break-words">
-         {chat.title}
-       </TooltipContent>
-     </Tooltip>
-   </div>
-   ```
-   - The outer `div` with `min-w-0 flex-1` becomes the flex child that shrinks
-   - The inner `span` with `block truncate` handles the text ellipsis
-   - This ensures the title stays within bounds and the `pr-8` space is preserved for the 3-dot menu
-
-2. **Fix tooltip position**: Change `side="right"` to `side="bottom"` so the tooltip appears directly below the title text rather than far to the right of the sidebar.
-
-### Summary
-- One file modified: `ChatSidebar.tsx`
-- Fixes all three issues: truncation with "...", visible 3-dot menu, and closer tooltip positioning
-- No new dependencies or backend changes
+One file, one line change.
