@@ -37,6 +37,7 @@ const Index = () => {
   const [author, setAuthor] = useState("");
   const [coverId, setCoverId] = useState<number | null>(null);
   const [editionKey, setEditionKey] = useState<string | null>(null);
+  const [manualMode, setManualMode] = useState(false);
 
   const { data: books = [], isLoading } = useQuery({
     queryKey: ["books"],
@@ -81,7 +82,7 @@ const Index = () => {
                 <MessageCircle className="h-4 w-4" />
               </Button>
             </Link>
-            <Dialog open={open} onOpenChange={setOpen}>
+            <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setManualMode(false); }}>
               <DialogTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-9 w-9">
                   <Plus className="h-4 w-4" />
@@ -98,35 +99,66 @@ const Index = () => {
                   }}
                   className="space-y-4">
 
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Title</Label>
-                    <BookSearchInput
-                      value={title}
-                      onChange={setTitle}
-                      onSelect={(book: OpenLibraryBook) => {
-                        setTitle(book.title);
-                        setAuthor(book.author);
-                        setCoverId(book.coverId);
-                        setEditionKey(book.editionKey);
-                      }} />
+                  {!manualMode ? (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="title">Search</Label>
+                        <BookSearchInput
+                          value={title}
+                          onChange={setTitle}
+                          onSelect={(book: OpenLibraryBook) => {
+                            setTitle(book.title);
+                            setAuthor(book.author);
+                            setCoverId(book.coverId);
+                            setEditionKey(book.editionKey);
+                          }} />
+                      </div>
+                      {author && (
+                        <div className="space-y-2">
+                          <Label>Author</Label>
+                          <Input value={author} readOnly className="bg-muted" />
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setManualMode(true)}
+                        className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                        Can't find it? Add manually
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="manual-title">Title</Label>
+                        <Input
+                          id="manual-title"
+                          placeholder="e.g. Atomic Habits"
+                          value={title}
+                          onChange={(e) => setTitle(e.target.value)} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="manual-author">Author</Label>
+                        <Input
+                          id="manual-author"
+                          placeholder="e.g. James Clear"
+                          value={author}
+                          onChange={(e) => setAuthor(e.target.value)} />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setManualMode(false)}
+                        className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                        ← Back to search
+                      </button>
+                    </>
+                  )}
 
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="author">Author</Label>
-                    <Input
-                      id="author"
-                      placeholder="e.g. James Clear"
-                      value={author}
-                      onChange={(e) => setAuthor(e.target.value)} />
-
-                  </div>
                   <Button type="submit" className="w-full" disabled={addMutation.isPending || !title || !author}>
                     {addMutation.isPending ?
                     <>
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Generating summary…
                       </> :
-
                     "Add Book"
                     }
                   </Button>

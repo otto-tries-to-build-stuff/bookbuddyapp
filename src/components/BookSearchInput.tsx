@@ -57,7 +57,7 @@ export function BookSearchInput({ value, onChange, onSelect }: BookSearchInputPr
 
       {showDropdown && (
         <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-popover shadow-md">
-          <ul className="max-h-60 overflow-y-auto py-1">
+          <ul className="max-h-80 overflow-y-auto py-1">
             {results.map((book, i) => {
               const cover = getCoverUrl(book.coverId, "S");
               return (
