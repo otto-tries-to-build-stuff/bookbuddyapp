@@ -1,20 +1,19 @@
 
 
-# Fix Broken String Interpolation in Pass 2 System Prompt
+# Switch Book Summary Model to OpenAI GPT-5.2
 
-## Problem
-Line 102 in `generate-book-summary/index.ts` uses a regular string with curly quotation marks instead of a template literal with backticks. This means `${title}` and `${author}` are sent as literal text to the AI, not the actual values.
+## What Changes
 
-## Fix
-Change line 102 from a regular string to a template literal (backticks), matching the style used everywhere else in the file:
+Update the `generate-book-summary` edge function to use `openai/gpt-5.2` instead of the current Gemini models. This model has enhanced reasoning capabilities which should help with accurately identifying and listing all chapters.
 
-```
-// Before (broken — regular string, no interpolation):
-{ role: "system", content: "Using Google Books, list the official table of contents for \u201C${title}\u201D by ${author}." },
+## Technical Details
 
-// After (fixed — template literal, variables interpolated):
-{ role: "system", content: `List the official table of contents for "${title}" by ${author}. Output one chapter per line, no commentary.` },
-```
+**File: `supabase/functions/generate-book-summary/index.ts`**
 
-This is a one-line fix in `supabase/functions/generate-book-summary/index.ts`. The edge function will be redeployed after the change.
+- Change the model selection (lines ~88-90) from:
+  - `google/gemini-3-flash-preview` (when real chapters exist) -> `openai/gpt-5.2`
+  - `google/gemini-2.5-pro` (fallback/no chapters) -> `openai/gpt-5.2`
+- Use `openai/gpt-5.2` for both cases since its stronger reasoning should handle both scenarios well
+
+This is a one-line change -- no other files need updating.
 

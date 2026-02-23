@@ -154,16 +154,6 @@ const BookDetail = () => {
               </section>
           }
 
-            {/* Table of Contents */}
-            {book.table_of_contents.length > 0 &&
-          <section>
-                <h2 className="mb-3 text-xl font-sans">Table of Contents</h2>
-                <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-                  {book.table_of_contents.join("\n")}
-                </p>
-              </section>
-          }
-
             {/* Personal Notes */}
             <section>
               <div className="mb-3 flex items-center justify-between">

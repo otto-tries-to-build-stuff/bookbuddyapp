@@ -6,7 +6,6 @@ export interface Book {
   author: string;
   summary: string | null;
   key_learnings: string[];
-  table_of_contents: string[];
   cover_id: number | null;
   notes: string | null;
   created_at: string;
@@ -22,7 +21,6 @@ export async function fetchBooks(): Promise<Book[]> {
   return (data || []).map((b) => ({
     ...b,
     key_learnings: Array.isArray(b.key_learnings) ? b.key_learnings as string[] : [],
-    table_of_contents: Array.isArray((b as any).chapters) ? (b as any).chapters as string[] : [],
   }));
 }
 
@@ -39,7 +37,7 @@ export async function addBook(title: string, author: string, coverId?: number | 
   try {
     const { data: aiData, error: fnError } = await supabase.functions.invoke(
       "generate-book-summary",
-      { body: { title, author, editionKey: editionKey ?? null } }
+      { body: { title, author } }
     );
 
     if (!fnError && aiData?.summary) {
@@ -48,7 +46,6 @@ export async function addBook(title: string, author: string, coverId?: number | 
         .update({
           summary: aiData.summary,
           key_learnings: aiData.key_learnings || [],
-          chapters: aiData.table_of_contents || [],
         })
         .eq("id", book.id)
         .select()
@@ -58,7 +55,6 @@ export async function addBook(title: string, author: string, coverId?: number | 
         return {
           ...updated,
           key_learnings: Array.isArray(updated.key_learnings) ? updated.key_learnings as string[] : [],
-          table_of_contents: Array.isArray((updated as any).chapters) ? (updated as any).chapters as string[] : [],
         };
       }
     }
@@ -69,7 +65,6 @@ export async function addBook(title: string, author: string, coverId?: number | 
   return {
     ...book,
     key_learnings: Array.isArray(book.key_learnings) ? book.key_learnings as string[] : [],
-    table_of_contents: Array.isArray((book as any).chapters) ? (book as any).chapters as string[] : [],
   };
 }
 
