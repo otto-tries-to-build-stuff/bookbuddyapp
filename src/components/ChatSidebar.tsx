@@ -220,14 +220,16 @@ function ChatItem({
           autoFocus
         />
       ) : (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="min-w-0 flex-1 truncate">{chat.title}</span>
-          </TooltipTrigger>
-          <TooltipContent side="right" className="max-w-[200px] break-words">
-            {chat.title}
-          </TooltipContent>
-        </Tooltip>
+        <div className="min-w-0 flex-1">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="block truncate">{chat.title}</span>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-[200px] break-words">
+              {chat.title}
+            </TooltipContent>
+          </Tooltip>
+        </div>
       )}
 
       <DropdownMenu>
