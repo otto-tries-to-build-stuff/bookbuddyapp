@@ -58,7 +58,7 @@ Only respond with the JSON via the tool call, no other text.`;
                       required: ["title", "detail"],
                       additionalProperties: false,
                     },
-                    description: "5-7 key lessons from the book",
+                    description: "The most important key lessons from the book, as many as appropriate",
                   },
                 },
                 required: ["summary", "key_learnings"],
