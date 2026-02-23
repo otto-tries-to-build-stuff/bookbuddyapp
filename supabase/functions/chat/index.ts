@@ -18,7 +18,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    let query = supabase.from("books").select("id, title, author, summary, key_learnings, chapters");
+    let query = supabase.from("books").select("id, title, author, summary, key_learnings");
     if (Array.isArray(bookIds) && bookIds.length > 0) {
       query = query.in("id", bookIds);
     }
@@ -27,12 +27,10 @@ serve(async (req) => {
     const bookContext = books?.length
       ? books
           .map((b) => {
-            const chapters = Array.isArray(b.chapters) && b.chapters.length > 0
-              ? `\nChapters:\n${b.chapters.map((c: any) => `  Ch.${c.number}: "${c.title}" - ${c.summary}`).join("\n")}`
+            const learnings = Array.isArray(b.key_learnings)
+              ? b.key_learnings.map((l: any) => `  - ${l.title}: ${l.detail}`).join("\n")
               : "";
-            return `📖 [ID: ${b.id}] "${b.title}" by ${b.author}\nSummary: ${b.summary}\nKey Learnings: ${
-              Array.isArray(b.key_learnings) ? b.key_learnings.join("; ") : ""
-            }${chapters}`;
+            return `📖 "${b.title}" by ${b.author}\nSummary: ${b.summary}${learnings ? `\nKey Lessons:\n${learnings}` : ""}`;
           })
           .join("\n\n")
       : "No books in the library yet.";
@@ -49,11 +47,9 @@ Guidelines:
 - If asked about a book not in the library, let them know and offer general knowledge
 - Be concise but thorough
 - Use markdown formatting for readability
-- **IMPORTANT**: When chapter data is available for a book, reference the specific chapter by name. For example: "*(Chapter 3: The Four Laws of Behavior Change, Atomic Habits)*"
-- **NEVER** fabricate or guess chapter names, sections, or page numbers. Only cite chapters that are explicitly listed in the book data above. If no chapter data is available, reference the book title only.
-- When listing key learnings or concepts, attribute each to its source book and chapter/section
+- When referencing ideas, cite the book title. For example: "*(Atomic Habits)*"
+- When listing key learnings or concepts, attribute each to its source book
 - Use relevant emojis at the start of section headings and key bullet points to make responses visually engaging and easier to scan (e.g. 📚, 💡, 🔑, ✅, 🧠, 📝)`;
-
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
