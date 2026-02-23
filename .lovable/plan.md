@@ -1,19 +1,17 @@
 
 
-# Switch Book Summary Model to OpenAI GPT-5.2
+## Remove Markdown Formatting from Book Summaries
 
-## What Changes
+**Problem:** The AI model wraps book titles in asterisks (e.g., `*Atomic Habits*`) within the summary text. Since the summary is rendered as plain text, the asterisks show up literally.
 
-Update the `generate-book-summary` edge function to use `openai/gpt-5.2` instead of the current Gemini models. This model has enhanced reasoning capabilities which should help with accurately identifying and listing all chapters.
+**Solution:** Add an instruction to the system prompt telling the model not to use any markdown formatting in its output. This is the cleanest fix since the summary is displayed as plain text.
 
-## Technical Details
+### Changes
 
 **File: `supabase/functions/generate-book-summary/index.ts`**
+- Add "Do not use any markdown formatting (no asterisks, bold, italics, etc.) in your response." to the system prompt
 
-- Change the model selection (lines ~88-90) from:
-  - `google/gemini-3-flash-preview` (when real chapters exist) -> `openai/gpt-5.2`
-  - `google/gemini-2.5-pro` (fallback/no chapters) -> `openai/gpt-5.2`
-- Use `openai/gpt-5.2` for both cases since its stronger reasoning should handle both scenarios well
+This is a one-line addition to the prompt. The edge function will be redeployed automatically.
 
-This is a one-line change -- no other files need updating.
+**Note:** Existing book summaries that already contain asterisks will remain unchanged. You would need to delete and re-add those books to get clean summaries.
 
