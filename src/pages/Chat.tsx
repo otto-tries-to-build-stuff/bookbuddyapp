@@ -266,7 +266,7 @@ const Chat = () => {
                   }>
 
                     {msg.role === "assistant" ?
-                  <div className="prose prose-base dark:prose-invert">
+                  <div className="prose prose-sm dark:prose-invert">
                         <ReactMarkdown>{msg.content}</ReactMarkdown>
                       </div> :
 
