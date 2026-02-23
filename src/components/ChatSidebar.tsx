@@ -194,7 +194,7 @@ function ChatItem({
     <div
       onClick={onSelect}
       className={cn(
-        "group relative flex items-center gap-2 rounded-md px-3 py-2 pr-8 text-sm transition-colors",
+        "group grid grid-cols-[auto_1fr_auto] items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
         tab === "history" && "cursor-pointer",
         isActive ? "bg-accent/10 text-accent" : "text-foreground hover:bg-secondary"
       )}
@@ -232,9 +232,10 @@ function ChatItem({
         </div>
       )}
 
+      <div className="shrink-0">
       <DropdownMenu>
         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-          <button className="absolute right-1 top-1/2 -translate-y-1/2 shrink-0 rounded p-1 text-muted-foreground hover:bg-secondary">
+          <button className="shrink-0 rounded p-1 text-muted-foreground hover:bg-secondary">
             <MoreHorizontal className="h-4 w-4" />
           </button>
         </DropdownMenuTrigger>
@@ -272,6 +273,7 @@ function ChatItem({
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+      </div>
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
