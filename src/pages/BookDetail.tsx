@@ -146,7 +146,7 @@ const BookDetail = () => {
                   {book.key_learnings.map((lesson, i) =>
               <AccordionItem key={i} value={`lesson-${i}`} className="border rounded-xl px-4">
                       <AccordionTrigger className="text-sm font-medium hover:no-underline">
-                        <span className="flex items-center gap-3 text-left">
+                        <span className="flex items-center gap-3 text-left font-sans">
                           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-medium text-accent">
                             {i + 1}
                           </span>
