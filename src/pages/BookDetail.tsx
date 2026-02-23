@@ -3,6 +3,7 @@ import bookmindLogo from "@/assets/bookmind-logo.png";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, BookOpen, Loader2, Save, PenLine, Trash2 } from "lucide-react";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { fetchBooks, updateBookNotes, deleteBook } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
 import {
@@ -140,17 +141,24 @@ const BookDetail = () => {
             {/* Key Takeaways */}
             {book.key_learnings.length > 0 &&
           <section>
-                <h2 className="mb-3 text-xl font-sans">Key Takeaways</h2>
-                <ul className="space-y-3">
-                  {book.key_learnings.map((learning, i) =>
-              <li key={i} className="flex gap-3">
-                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-medium text-accent">
-                        {i + 1}
-                      </span>
-                      <span className="text-sm leading-relaxed text-muted-foreground">{learning}</span>
-                    </li>
+                <h2 className="mb-3 text-xl font-sans">Key Lessons</h2>
+                <Accordion type="multiple" className="space-y-2">
+                  {book.key_learnings.map((lesson, i) =>
+              <AccordionItem key={i} value={`lesson-${i}`} className="border rounded-xl px-4">
+                      <AccordionTrigger className="text-sm font-medium hover:no-underline">
+                        <span className="flex items-center gap-3 text-left">
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-medium text-accent">
+                            {i + 1}
+                          </span>
+                          {lesson.title}
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm leading-relaxed text-muted-foreground pl-9">
+                        {lesson.detail}
+                      </AccordionContent>
+                    </AccordionItem>
               )}
-                </ul>
+                </Accordion>
               </section>
           }
 

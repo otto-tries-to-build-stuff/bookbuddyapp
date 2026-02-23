@@ -16,11 +16,11 @@ serve(async (req) => {
 
     const systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
 1. A concise summary (2-3 paragraphs)
-2. 5-7 key learnings/takeaways as an array
+2. 5-7 key lessons from the book. Each lesson has a short title and 1-2 paragraphs of supporting detail that explains the lesson in depth.
 
 Only respond with the JSON via the tool call, no other text.`;
 
-    const userPrompt = `Generate the summary and key takeaways for "${title}" by ${author}.`;
+    const userPrompt = `Generate the summary and key lessons for "${title}" by ${author}.`;
 
     const model = "openai/gpt-5.2";
 
@@ -48,8 +48,16 @@ Only respond with the JSON via the tool call, no other text.`;
                   summary: { type: "string", description: "A 2-3 paragraph summary of the book" },
                   key_learnings: {
                     type: "array",
-                    items: { type: "string" },
-                    description: "5-7 key takeaways from the book",
+                    items: {
+                      type: "object",
+                      properties: {
+                        title: { type: "string", description: "Short lesson title" },
+                        detail: { type: "string", description: "1-2 paragraphs of supporting detail" },
+                      },
+                      required: ["title", "detail"],
+                      additionalProperties: false,
+                    },
+                    description: "5-7 key lessons from the book",
                   },
                 },
                 required: ["summary", "key_learnings"],
