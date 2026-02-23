@@ -26,7 +26,7 @@ const Home = () => {
         </Avatar>
       </Link>
       {/* Book image */}
-      <div className="mb-8 h-48 w-48 sm:h-56 sm:w-56">
+      <div className="mb-8 h-64 w-64 sm:h-72 sm:w-72">
         <img
 
           alt="Book"
