@@ -1,17 +1,24 @@
 
 
-## Fix "5-7 Key Lessons" Reference in Tool Schema
+## Improve Book Search Relevance
 
-**Problem:** While the system prompt was updated to allow a dynamic number of lessons, the tool calling schema still contains `"description": "5-7 key lessons from the book"` on line 56. The model treats the tool schema as a strong constraint, so it continues producing exactly 7 lessons.
+**Problem:** Searching for "Transformed" doesn't surface the right book because the API only fetches 8 results sorted by popularity/age, and newer or less popular titles get pushed out.
 
-**Solution:** Update the `description` field of the `key_learnings` property in the tool schema to match the updated prompt.
+**Solution:** Fetch more results from the API and re-sort them by relevance on the client side, showing up to 20 results in the dropdown.
 
-### Changes
+### Technical Details
 
-**File: `supabase/functions/generate-book-summary/index.ts`** (line 56)
-- Change: `"5-7 key lessons from the book"`
-- To: `"The most important key lessons from the book, as many as appropriate"`
+**File: `src/lib/openLibrary.ts`**
 
-This is a single string change. The edge function will be redeployed automatically.
+1. Change `limit=8` to `limit=30` in the API URL (fetch a larger pool for sorting)
+2. Add a client-side relevance scoring function after mapping results:
+   - Score 0 (best): title matches the query exactly (case-insensitive)
+   - Score 1: title starts with the query
+   - Score 2: title contains the query as a standalone word
+   - Score 3: everything else
+3. Sort by score ascending, then slice to 20 results
 
-**Note:** Existing books will keep their current 7 lessons. You would need to delete and re-add a book to see the dynamic count in action.
+**File: `src/components/BookSearchInput.tsx`**
+
+No changes needed -- the dropdown already uses `max-h-60 overflow-y-auto`, so 20 results will be scrollable.
+
