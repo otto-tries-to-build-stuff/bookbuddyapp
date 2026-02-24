@@ -18,6 +18,7 @@ import {
   fetchChatMessages,
   saveChatMessage,
   updateChatTitle,
+  updateChatBookIds,
   generateChatTitle } from
 "@/lib/api";
 import ReactMarkdown from "react-markdown";
@@ -47,7 +48,7 @@ const Chat = () => {
 
   const activeChat = chats.find((c) => c.id === activeChatId);
 
-  // Load messages when active chat changes
+  // Load messages and restore book selection when active chat changes
   useEffect(() => {
     if (!activeChatId) {
       setMessages([]);
@@ -56,7 +57,12 @@ const Chat = () => {
     fetchChatMessages(activeChatId).then((msgs) => {
       setMessages(msgs.map((m) => ({ role: m.role, content: m.content })));
     });
-  }, [activeChatId]);
+    // Restore book selection from chat
+    const chat = chats.find((c) => c.id === activeChatId);
+    if (chat?.book_ids?.length) {
+      setSelectedBookIds(chat.book_ids);
+    }
+  }, [activeChatId, chats]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -95,7 +101,7 @@ const Chat = () => {
     let chatId = activeChatId;
     if (!chatId) {
       try {
-        const chat = await createChat("New Chat");
+        const chat = await createChat("New Chat", selectedBookIds.length > 0 ? selectedBookIds : undefined);
         chatId = chat.id;
         setActiveChatId(chatId);
         queryClient.invalidateQueries({ queryKey: ["chats"] });

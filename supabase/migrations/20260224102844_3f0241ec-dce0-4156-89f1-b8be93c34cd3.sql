@@ -1,0 +1,1 @@
+ALTER TABLE public.chats ADD COLUMN book_ids jsonb NOT NULL DEFAULT '[]'::jsonb;
