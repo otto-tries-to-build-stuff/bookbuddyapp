@@ -214,26 +214,26 @@ const Chat = () => {
         <ScrollArea className="flex-1">
           <div className="mx-auto max-w-3xl px-6 py-6">
             {/* Chat title and context books */}
-            {hasStartedChat && activeChat && (
-              <div className="mb-6 space-y-2">
-                <h2 className="text-lg font-semibold text-foreground">{activeChat.title}</h2>
-                {selectedBookIds.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-1.5">
+            {hasStartedChat && activeChat &&
+            <div className="mb-6 space-y-2">
+                <h2 className="font-semibold text-foreground font-sans text-3xl">{activeChat.title}</h2>
+                {selectedBookIds.length > 0 &&
+              <div className="flex flex-wrap items-center gap-1.5">
                     <BookOpen className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">Context:</span>
                     {selectedBookIds.map((id) => {
-                      const book = books.find((b) => b.id === id);
-                      return book ? (
-                        <Badge key={id} variant="secondary" className="text-xs py-0.5 px-2">
+                  const book = books.find((b) => b.id === id);
+                  return book ?
+                  <Badge key={id} variant="secondary" className="text-xs py-0.5 px-2">
                           {book.title}
-                        </Badge>
-                      ) : null;
-                    })}
+                        </Badge> :
+                  null;
+                })}
                   </div>
-                )}
+              }
                 <div className="border-b border-border" />
               </div>
-            )}
+            }
 
             {!hasStartedChat &&
             <div className="flex flex-col items-center justify-center pt-4 pb-12 text-center">
