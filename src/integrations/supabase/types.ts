@@ -87,6 +87,7 @@ export type Database = {
       }
       chats: {
         Row: {
+          book_ids: Json
           created_at: string
           deleted_at: string | null
           id: string
@@ -95,6 +96,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          book_ids?: Json
           created_at?: string
           deleted_at?: string | null
           id?: string
@@ -103,6 +105,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          book_ids?: Json
           created_at?: string
           deleted_at?: string | null
           id?: string

@@ -127,6 +127,7 @@ export async function regenerateBookSummary(id: string, title: string, author: s
 export interface Chat {
   id: string;
   title: string;
+  book_ids: string[];
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
@@ -158,17 +159,25 @@ export async function fetchArchivedChats(): Promise<Chat[]> {
     .not("deleted_at", "is", null)
     .order("deleted_at", { ascending: false });
   if (error) throw error;
-  return ((data || []) as any[]).map((c) => ({ ...c, pinned_at: c.pinned_at ?? null }));
+  return ((data || []) as any[]).map((c) => ({ ...c, pinned_at: c.pinned_at ?? null, book_ids: Array.isArray(c.book_ids) ? c.book_ids : [] }));
 }
 
-export async function createChat(title?: string): Promise<Chat> {
+export async function createChat(title?: string, bookIds?: string[]): Promise<Chat> {
   const { data, error } = await supabase
     .from("chats")
-    .insert({ title: title || "New Chat" })
+    .insert({ title: title || "New Chat", book_ids: bookIds || [] } as any)
     .select()
     .single();
   if (error) throw error;
-  return data;
+  return { ...(data as any), book_ids: Array.isArray((data as any).book_ids) ? (data as any).book_ids : [] };
+}
+
+export async function updateChatBookIds(id: string, bookIds: string[]): Promise<void> {
+  const { error } = await supabase
+    .from("chats")
+    .update({ book_ids: bookIds } as any)
+    .eq("id", id);
+  if (error) throw error;
 }
 
 export async function updateChatTitle(id: string, title: string): Promise<void> {
