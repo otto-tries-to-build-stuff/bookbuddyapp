@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Send, Loader2, Check, Menu } from "lucide-react";
+import { ArrowLeft, Send, Loader2, Check, Menu, BookOpen } from "lucide-react";
 import chatIcon from "@/assets/chat-icon.png";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchBooks,
+  fetchChats,
   streamChat,
   createChat,
   fetchChatMessages,
@@ -38,6 +39,13 @@ const Chat = () => {
     queryKey: ["books"],
     queryFn: fetchBooks
   });
+
+  const { data: chats = [] } = useQuery({
+    queryKey: ["chats"],
+    queryFn: fetchChats
+  });
+
+  const activeChat = chats.find((c) => c.id === activeChatId);
 
   // Load messages when active chat changes
   useEffect(() => {
@@ -199,6 +207,28 @@ const Chat = () => {
         {/* Messages */}
         <ScrollArea className="flex-1">
           <div className="mx-auto max-w-3xl px-6 py-6">
+            {/* Chat title and context books */}
+            {hasStartedChat && activeChat && (
+              <div className="mb-6 space-y-2">
+                <h2 className="text-lg font-semibold text-foreground">{activeChat.title}</h2>
+                {selectedBookIds.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <BookOpen className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">Context:</span>
+                    {selectedBookIds.map((id) => {
+                      const book = books.find((b) => b.id === id);
+                      return book ? (
+                        <Badge key={id} variant="secondary" className="text-xs py-0.5 px-2">
+                          {book.title}
+                        </Badge>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+                <div className="border-b border-border" />
+              </div>
+            )}
+
             {!hasStartedChat &&
             <div className="flex flex-col items-center justify-center pt-4 pb-12 text-center">
                 <img alt="Chat with books" className="mb-8 h-48 w-48" src="/lovable-uploads/5cc5737f-690e-41df-af95-5d7f4c51d9fc.png" />
