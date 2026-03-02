@@ -2,7 +2,9 @@ import { useState } from "react";
 import bookmindLogo from "@/assets/bookmind-logo.png";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { Plus, BookOpen, MessageCircle, Trash2, Loader2, ArrowLeft } from "lucide-react";
+import { Plus, BookOpen, MessageCircle, Trash2, Loader2, User } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { fetchProfile } from "@/lib/api";
 import { BookSearchInput } from "@/components/BookSearchInput";
 import type { OpenLibraryBook } from "@/lib/openLibrary";
 import { getCoverUrl } from "@/lib/openLibrary";
@@ -44,6 +46,11 @@ const Index = () => {
     queryFn: fetchBooks
   });
 
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: fetchProfile
+  });
+
   const addMutation = useMutation({
     mutationFn: () => addBook(title, author, coverId, editionKey),
     onSuccess: () => {
@@ -71,10 +78,13 @@ const Index = () => {
       {/* Top bar */}
       <header className="px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-lg md:max-w-3xl lg:max-w-5xl items-center justify-between">
-          <Link
-            to="/"
-            className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary">
-            <ArrowLeft className="h-5 w-5" />
+          <Link to="/profile">
+            <Avatar className="h-9 w-9 border border-border">
+              {profile?.avatar_url ? <AvatarImage src={profile.avatar_url} alt="Profile" /> : null}
+              <AvatarFallback className="bg-secondary text-muted-foreground">
+                <User className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
           </Link>
           <div className="flex items-center gap-1">
             <Link to="/chat">
