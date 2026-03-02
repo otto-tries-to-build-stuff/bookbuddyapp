@@ -43,6 +43,12 @@ export default function AuthPage() {
             <CardDescription>
               We sent a verification link to <span className="font-medium text-foreground">{email}</span>. Click the link to activate your account.
             </CardDescription>
+            <Alert className="mt-3">
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Didn't receive the email? Check your spam or junk folder.
+              </AlertDescription>
+            </Alert>
           </CardHeader>
           <CardContent>
             <Button variant="outline" className="w-full" onClick={() => setShowVerification(false)}>
