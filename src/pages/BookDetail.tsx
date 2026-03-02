@@ -3,19 +3,19 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft, BookOpen, Loader2, Save, PenLine, Trash2,
-  RefreshCw, Plus, X, Info,
-} from "lucide-react";
+  RefreshCw, Plus, X, Info } from
+"lucide-react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import {
   fetchBooks, updateBookNotes, deleteBook,
   updateBookSummary, updateBookKeyLearnings, regenerateBookSummary,
-  type KeyLesson,
-} from "@/lib/api";
+  type KeyLesson } from
+"@/lib/api";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
-  AlertDialogTitle, AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+  AlertDialogTitle, AlertDialogTrigger } from
+"@/components/ui/alert-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getCoverUrl } from "@/lib/openLibrary";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,14 +24,14 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
 const BookDetail = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{id: string;}>();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const { data: books = [], isLoading } = useQuery({
     queryKey: ["books"],
-    queryFn: fetchBooks,
+    queryFn: fetchBooks
   });
   const book = books.find((b) => b.id === id);
 
@@ -62,7 +62,7 @@ const BookDetail = () => {
       toast({ title: "Book deleted" });
       navigate("/library");
     },
-    onError: (e) => toast({ title: "Error deleting book", description: e.message, variant: "destructive" }),
+    onError: (e) => toast({ title: "Error deleting book", description: e.message, variant: "destructive" })
   });
 
   const notesMutation = useMutation({
@@ -72,7 +72,7 @@ const BookDetail = () => {
       setEditing(false);
       toast({ title: "Notes saved" });
     },
-    onError: (e) => toast({ title: "Error saving notes", description: e.message, variant: "destructive" }),
+    onError: (e) => toast({ title: "Error saving notes", description: e.message, variant: "destructive" })
   });
 
   const summaryMutation = useMutation({
@@ -82,7 +82,7 @@ const BookDetail = () => {
       setEditingSummary(false);
       toast({ title: "Summary updated" });
     },
-    onError: (e) => toast({ title: "Error updating summary", description: e.message, variant: "destructive" }),
+    onError: (e) => toast({ title: "Error updating summary", description: e.message, variant: "destructive" })
   });
 
   const lessonsMutation = useMutation({
@@ -92,7 +92,7 @@ const BookDetail = () => {
       setEditingLessons(false);
       toast({ title: "Key lessons updated" });
     },
-    onError: (e) => toast({ title: "Error updating lessons", description: e.message, variant: "destructive" }),
+    onError: (e) => toast({ title: "Error updating lessons", description: e.message, variant: "destructive" })
   });
 
   const regenerateMutation = useMutation({
@@ -101,13 +101,13 @@ const BookDetail = () => {
       queryClient.invalidateQueries({ queryKey: ["books"] });
       toast({ title: "Summary regenerated" });
     },
-    onError: (e) => toast({ title: "Error regenerating summary", description: e.message, variant: "destructive" }),
+    onError: (e) => toast({ title: "Error regenerating summary", description: e.message, variant: "destructive" })
   });
 
   // --- Helpers for editing lessons ---
 
   const updateLesson = (index: number, field: keyof KeyLesson, value: string) => {
-    setEditingLessonsData((prev) => prev.map((l, i) => (i === index ? { ...l, [field]: value } : l)));
+    setEditingLessonsData((prev) => prev.map((l, i) => i === index ? { ...l, [field]: value } : l));
   };
 
   const removeLesson = (index: number) => {
@@ -124,8 +124,8 @@ const BookDetail = () => {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+      </div>);
+
   }
 
   if (!book) {
@@ -133,8 +133,8 @@ const BookDetail = () => {
       <div className="flex min-h-screen flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">Book not found</p>
         <Link to="/" className="text-accent underline">Back to library</Link>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -162,8 +162,8 @@ const BookDetail = () => {
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => deleteMutation.mutate()}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+
                   {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -177,11 +177,11 @@ const BookDetail = () => {
         <div className="mb-10 flex flex-col items-center md:flex-row md:items-start md:gap-8">
           {(() => {
             const coverUrl = getCoverUrl(book.cover_id, "L");
-            return coverUrl ? (
-              <div className="mb-6 flex shrink-0 justify-center md:mb-0">
+            return coverUrl ?
+            <div className="mb-6 flex shrink-0 justify-center md:mb-0">
                 <img src={coverUrl} alt={`Cover of ${book.title}`} className="h-72 rounded-2xl object-contain shadow-lg" />
-              </div>
-            ) : null;
+              </div> :
+            null;
           })()}
           <div>
             <h1 className="mb-1 text-3xl leading-tight sm:text-4xl font-sans font-normal">{book.title}</h1>
@@ -189,8 +189,8 @@ const BookDetail = () => {
           </div>
         </div>
 
-        {book.summary ? (
-          <div className="space-y-10">
+        {book.summary ?
+        <div className="space-y-10">
             {/* AI Disclaimer */}
             <Alert className="border-muted bg-muted/40">
               <Info className="h-4 w-4 text-muted-foreground" />
@@ -204,31 +204,31 @@ const BookDetail = () => {
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-xl font-sans">Summary</h2>
                 <div className="flex items-center gap-1">
-                  {!editingSummary && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setEditingSummaryText(book.summary || "");
-                        setEditingSummary(true);
-                      }}
-                    >
+                  {!editingSummary &&
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setEditingSummaryText(book.summary || "");
+                    setEditingSummary(true);
+                  }}>
+
                       Edit
                     </Button>
-                  )}
+                }
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
-                        variant="ghost"
-                        size="sm"
-                        className="gap-1.5"
-                        disabled={regenerateMutation.isPending}
-                      >
-                        {regenerateMutation.isPending ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <RefreshCw className="h-3.5 w-3.5" />
-                        )}
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1.5"
+                      disabled={regenerateMutation.isPending}>
+
+                        {regenerateMutation.isPending ?
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" /> :
+
+                      <RefreshCw className="h-3.5 w-3.5" />
+                      }
                         Regenerate
                       </Button>
                     </AlertDialogTrigger>
@@ -250,13 +250,13 @@ const BookDetail = () => {
                 </div>
               </div>
 
-              {editingSummary ? (
-                <div className="space-y-3">
+              {editingSummary ?
+            <div className="space-y-3">
                   <Textarea
-                    value={editingSummaryText}
-                    onChange={(e) => setEditingSummaryText(e.target.value)}
-                    className="min-h-[180px] resize-y rounded-xl text-sm"
-                  />
+                value={editingSummaryText}
+                onChange={(e) => setEditingSummaryText(e.target.value)}
+                className="min-h-[180px] resize-y rounded-xl text-sm" />
+
                   <div className="flex gap-2">
                     <Button size="sm" onClick={() => summaryMutation.mutate()} disabled={summaryMutation.isPending} className="gap-1.5">
                       {summaryMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
@@ -266,57 +266,57 @@ const BookDetail = () => {
                       Cancel
                     </Button>
                   </div>
-                </div>
-              ) : (
-                <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{book.summary}</p>
-              )}
+                </div> :
+
+            <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{book.summary}</p>
+            }
             </section>
 
             {/* Key Lessons */}
-            {book.key_learnings.length > 0 && (
-              <section>
+            {book.key_learnings.length > 0 &&
+          <section>
                 <div className="mb-3 flex items-center justify-between">
-                  <h2 className="text-xl font-sans">Key Lessons</h2>
-                  {!editingLessons && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setEditingLessonsData(book.key_learnings.map((l) => ({ ...l })));
-                        setEditingLessons(true);
-                      }}
-                    >
+                  <h2 className="text-xl font-sans">Key Takeaways </h2>
+                  {!editingLessons &&
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setEditingLessonsData(book.key_learnings.map((l) => ({ ...l })));
+                  setEditingLessons(true);
+                }}>
+
                       Edit
                     </Button>
-                  )}
+              }
                 </div>
 
-                {editingLessons ? (
-                  <div className="space-y-4">
-                    {editingLessonsData.map((lesson, i) => (
-                      <div key={i} className="rounded-xl border p-4 space-y-2">
+                {editingLessons ?
+            <div className="space-y-4">
+                    {editingLessonsData.map((lesson, i) =>
+              <div key={i} className="rounded-xl border p-4 space-y-2">
                         <div className="flex items-center gap-2">
                           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-medium text-accent">
                             {i + 1}
                           </span>
                           <Input
-                            value={lesson.title}
-                            onChange={(e) => updateLesson(i, "title", e.target.value)}
-                            placeholder="Lesson title"
-                            className="flex-1 text-sm"
-                          />
+                    value={lesson.title}
+                    onChange={(e) => updateLesson(i, "title", e.target.value)}
+                    placeholder="Lesson title"
+                    className="flex-1 text-sm" />
+
                           <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => removeLesson(i)}>
                             <X className="h-4 w-4" />
                           </Button>
                         </div>
                         <Textarea
-                          value={lesson.detail}
-                          onChange={(e) => updateLesson(i, "detail", e.target.value)}
-                          placeholder="Lesson detail"
-                          className="min-h-[80px] resize-y text-sm"
-                        />
+                  value={lesson.detail}
+                  onChange={(e) => updateLesson(i, "detail", e.target.value)}
+                  placeholder="Lesson detail"
+                  className="min-h-[80px] resize-y text-sm" />
+
                       </div>
-                    ))}
+              )}
                     <Button variant="outline" size="sm" className="gap-1.5" onClick={addLesson}>
                       <Plus className="h-3.5 w-3.5" /> Add Lesson
                     </Button>
@@ -329,11 +329,11 @@ const BookDetail = () => {
                         Cancel
                       </Button>
                     </div>
-                  </div>
-                ) : (
-                  <Accordion type="multiple" className="space-y-2">
-                    {book.key_learnings.map((lesson, i) => (
-                      <AccordionItem key={i} value={`lesson-${i}`} className="border rounded-xl px-4">
+                  </div> :
+
+            <Accordion type="multiple" className="space-y-2">
+                    {book.key_learnings.map((lesson, i) =>
+              <AccordionItem key={i} value={`lesson-${i}`} className="border rounded-xl px-4">
                         <AccordionTrigger className="text-sm font-medium hover:no-underline">
                           <span className="flex items-center gap-3 text-left font-sans">
                             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-medium text-accent">
@@ -346,11 +346,11 @@ const BookDetail = () => {
                           {lesson.detail}
                         </AccordionContent>
                       </AccordionItem>
-                    ))}
+              )}
                   </Accordion>
-                )}
+            }
               </section>
-            )}
+          }
 
             {/* Personal Notes */}
             <section>
@@ -359,51 +359,51 @@ const BookDetail = () => {
                   <PenLine className="h-4 w-4 text-accent" />
                   My Notes
                 </h2>
-                {!editing && (
-                  <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
+                {!editing &&
+              <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
                     Edit
                   </Button>
-                )}
+              }
               </div>
-              {editing ? (
-                <div className="space-y-3">
+              {editing ?
+            <div className="space-y-3">
                   <Textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Write your personal notes, reflections, and key takeaways here…"
-                    className="min-h-[140px] resize-y rounded-xl text-sm"
-                  />
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Write your personal notes, reflections, and key takeaways here…"
+                className="min-h-[140px] resize-y rounded-xl text-sm" />
+
                   <div className="flex gap-2">
                     <Button size="sm" onClick={() => notesMutation.mutate()} disabled={notesMutation.isPending} className="gap-1.5">
                       {notesMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
                       Save
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => { setNotes(book.notes ?? ""); setEditing(false); }}>
+                    <Button variant="ghost" size="sm" onClick={() => {setNotes(book.notes ?? "");setEditing(false);}}>
                       Cancel
                     </Button>
                   </div>
-                </div>
-              ) : notes ? (
-                <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{notes}</p>
-              ) : (
-                <button
-                  onClick={() => setEditing(true)}
-                  className="w-full rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground/70 transition-colors hover:border-accent/50 hover:text-muted-foreground"
-                >
+                </div> :
+            notes ?
+            <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{notes}</p> :
+
+            <button
+              onClick={() => setEditing(true)}
+              className="w-full rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground/70 transition-colors hover:border-accent/50 hover:text-muted-foreground">
+
                   Click to add your personal notes…
                 </button>
-              )}
+            }
             </section>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 text-muted-foreground">
+          </div> :
+
+        <div className="flex items-center gap-3 text-muted-foreground">
             <Loader2 className="h-5 w-5 animate-spin" />
             Generating summary…
           </div>
-        )}
+        }
       </main>
-    </div>
-  );
+    </div>);
+
 };
 
 export default BookDetail;
