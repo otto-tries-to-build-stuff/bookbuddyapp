@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Send, Loader2, Check, Menu, BookOpen } from "lucide-react";
+import { ArrowLeft, Send, Loader2, Check, Menu, BookOpen, Copy } from "lucide-react";
 import chatIcon from "@/assets/chat-icon.png";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
@@ -25,6 +25,20 @@ import ReactMarkdown from "react-markdown";
 import ChatSidebar from "@/components/ChatSidebar";
 
 type Msg = {role: "user" | "assistant";content: string;};
+
+const CopyButton = ({ content }: { content: string }) => {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={handleCopy}>
+      {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+    </Button>
+  );
+};
 
 const Chat = () => {
   const { toast } = useToast();
@@ -294,21 +308,20 @@ const Chat = () => {
             <div className="space-y-6">
               {messages.map((msg, i) =>
               <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-3 ${
-                  msg.role === "user" ?
-                  "bg-primary text-primary-foreground" :
-                  "bg-secondary text-secondary-foreground"}`
-                  }>
-
-                    {msg.role === "assistant" ?
-                  <div className="prose prose-sm dark:prose-invert">
-                        <ReactMarkdown>{msg.content}</ReactMarkdown>
-                      </div> :
-
-                  <p className="text-sm">{msg.content}</p>
-                  }
-                  </div>
+                  {msg.role === "assistant" ? (
+                    <div className="flex flex-col items-start gap-1 max-w-[85%]">
+                      <div className="rounded-2xl px-4 py-3 bg-secondary text-secondary-foreground">
+                        <div className="prose prose-sm dark:prose-invert">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
+                      </div>
+                      <CopyButton content={msg.content} />
+                    </div>
+                  ) : (
+                    <div className="max-w-[85%] rounded-2xl px-4 py-3 bg-primary text-primary-foreground">
+                      <p className="text-sm">{msg.content}</p>
+                    </div>
+                  )}
                 </div>
               )}
               {isLoading && messages[messages.length - 1]?.role !== "assistant" &&
