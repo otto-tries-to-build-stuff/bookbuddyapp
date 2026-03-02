@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Mail } from "lucide-react";
+import { Info, Loader2, Mail } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import homescreenBook from "@/assets/homescreen-book.png";
 
 export default function AuthPage() {
@@ -73,6 +74,12 @@ export default function AuthPage() {
           <CardHeader>
             <CardTitle className="text-xl">Reset password</CardTitle>
             <CardDescription>Enter your email to receive a reset link.</CardDescription>
+            <Alert className="mt-3">
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Didn't receive the email? Check your spam or junk folder.
+              </AlertDescription>
+            </Alert>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleReset} className="space-y-4">
