@@ -1,40 +1,36 @@
 
-## Plan: Editable Book Summary with Regenerate and AI Disclaimer
 
-### What will change
+## Add Copy Icon Below AI Messages
 
-**1. Regenerate Summary Button**
-- Add a "Regenerate" button (with a refresh icon) near the Summary heading
-- Clicking it will call the existing `generate-book-summary` edge function with the book's title and author, then update the database with the new summary and key lessons
-- A confirmation dialog will warn that this replaces the current summary
-- Shows a loading spinner while regenerating
+A small copy icon will appear below each assistant message bubble, always visible (not hover-dependent), matching the pattern shown in the reference screenshot.
 
-**2. Editable Summary and Key Lessons**
-- **Summary section**: Add an "Edit" button next to the heading (same pattern as the existing "My Notes" section). Clicking it shows the summary in a textarea; save/cancel buttons appear below
-- **Key Lessons section**: Add an "Edit" button next to the heading. In edit mode, each lesson's title becomes an input field and detail becomes a textarea. Users can also delete individual lessons or add new ones
-- Both save to the database via new API functions (`updateBookSummary` and `updateBookKeyLearnings`)
-
-**3. AI Disclaimer Info Box**
-- Add an info alert box (using the existing Alert component with an `Info` icon) just above the Summary section
-- Message: "AI-generated summaries may sometimes contain inaccuracies. You can regenerate the summary or edit any section manually."
-- Styled subtly so it doesn't dominate the page
-
----
+### Design
+- A subtle copy icon button sits directly below the left edge of each assistant message bubble
+- Always visible (not hidden behind hover)
+- Clicking copies the raw markdown text to clipboard
+- Icon transitions from `Copy` to `Check` for 2 seconds as confirmation
+- Only on assistant messages, not user messages
 
 ### Technical Details
 
-**New API functions in `src/lib/api.ts`:**
-- `updateBookSummary(id: string, summary: string)` -- updates the `summary` column
-- `updateBookKeyLearnings(id: string, keyLearnings: KeyLesson[])` -- updates the `key_learnings` column
-- `regenerateBookSummary(id: string, title: string, author: string)` -- calls the edge function and updates both `summary` and `key_learnings` in the database
+**Single file change: `src/pages/Chat.tsx`**
 
-**Changes to `src/pages/BookDetail.tsx`:**
-- Add state for editing summary (`editingSummary`, `editingSummaryText`)
-- Add state for editing key lessons (`editingLessons`, `editingLessonsData`)
-- Add `regenerateMutation` using `useMutation` that calls `regenerateBookSummary`
-- Add `summaryMutation` and `lessonsMutation` for saving edits
-- Add the info Alert component above the summary
-- Add edit/save/cancel UI for summary (textarea) and lessons (input + textarea per lesson, with add/delete controls)
-- Add a "Regenerate" button with `RefreshCw` icon next to the summary heading, wrapped in an `AlertDialog` for confirmation
+1. Import `Copy` icon from lucide-react (already have `Check`)
+2. Create a small `CopyButton` component inside the file:
+   - Takes `content: string` prop
+   - Manages `copied` state with 2-second timeout
+   - Uses `navigator.clipboard.writeText(content)`
+   - Renders as a ghost button with muted icon styling (`text-muted-foreground`, small size)
+3. Update the message rendering loop: for assistant messages, wrap the bubble and copy button in a container div, placing `<CopyButton>` below the bubble
+4. Style: `h-7 w-7` icon button, `text-muted-foreground hover:text-foreground` for subtle appearance
 
-**No database changes needed** -- the existing `books` table already has `summary` (text) and `key_learnings` (jsonb) columns, and the RLS policies allow updates.
+### Layout structure per assistant message:
+```text
++---------------------------+
+|  AI response bubble       |
++---------------------------+
+[copy icon]
+```
+
+No new dependencies or backend changes needed.
+
