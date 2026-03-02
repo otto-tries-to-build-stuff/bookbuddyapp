@@ -17,6 +17,12 @@ export interface Book {
   updated_at: string;
 }
 
+async function getUserId(): Promise<string> {
+  const { data } = await supabase.auth.getUser();
+  if (!data.user) throw new Error("Not authenticated");
+  return data.user.id;
+}
+
 export async function fetchBooks(): Promise<Book[]> {
   const { data, error } = await supabase
     .from("books")
@@ -30,15 +36,14 @@ export async function fetchBooks(): Promise<Book[]> {
 }
 
 export async function addBook(title: string, author: string, coverId?: number | null, editionKey?: string | null): Promise<Book> {
-  // First insert the book
+  const userId = await getUserId();
   const { data: book, error: insertError } = await supabase
     .from("books")
-    .insert({ title, author, cover_id: coverId ?? null })
+    .insert({ title, author, cover_id: coverId ?? null, user_id: userId })
     .select()
     .single();
   if (insertError) throw insertError;
 
-  // Generate summary via edge function
   try {
     const { data: aiData, error: fnError } = await supabase.functions.invoke(
       "generate-book-summary",
@@ -163,9 +168,10 @@ export async function fetchArchivedChats(): Promise<Chat[]> {
 }
 
 export async function createChat(title?: string, bookIds?: string[]): Promise<Chat> {
+  const userId = await getUserId();
   const { data, error } = await supabase
     .from("chats")
-    .insert({ title: title || "New Chat", book_ids: bookIds || [] } as any)
+    .insert({ title: title || "New Chat", book_ids: bookIds || [], user_id: userId } as any)
     .select()
     .single();
   if (error) throw error;
@@ -233,9 +239,10 @@ export async function fetchChatMessages(chatId: string): Promise<ChatMessage[]> 
 }
 
 export async function saveChatMessage(chatId: string, role: "user" | "assistant", content: string): Promise<ChatMessage> {
+  const userId = await getUserId();
   const { data, error } = await supabase
     .from("chat_messages")
-    .insert({ chat_id: chatId, role, content })
+    .insert({ chat_id: chatId, role, content, user_id: userId })
     .select()
     .single();
   if (error) throw error;
