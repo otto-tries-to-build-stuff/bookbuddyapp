@@ -12,7 +12,10 @@ import { useAuth } from "@/hooks/useAuth";
 
 const ProfilePage = () => {
   const { toast } = useToast();
-  const { user, signOut } = useAuth();
+  const { user, signOut, updatePassword } = useAuth();
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordLoading, setPasswordLoading] = useState(false);
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -155,8 +158,60 @@ const ProfilePage = () => {
           </Button>
         </div>
 
+        {/* Change password */}
+        <div className="mt-8 space-y-4 border-t border-border pt-6">
+          <h2 className="text-lg font-medium text-foreground">Change password</h2>
+          <div className="space-y-2">
+            <Label htmlFor="new-password">New password</Label>
+            <Input
+              id="new-password"
+              type="password"
+              placeholder="At least 6 characters"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirm-password">Confirm password</Label>
+            <Input
+              id="confirm-password"
+              type="password"
+              placeholder="Re-enter new password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </div>
+          <Button
+            onClick={async () => {
+              if (newPassword.length < 6) {
+                toast({ title: "Password must be at least 6 characters", variant: "destructive" });
+                return;
+              }
+              if (newPassword !== confirmPassword) {
+                toast({ title: "Passwords do not match", variant: "destructive" });
+                return;
+              }
+              setPasswordLoading(true);
+              const { error } = await updatePassword(newPassword);
+              setPasswordLoading(false);
+              if (error) {
+                toast({ title: "Error", description: error.message, variant: "destructive" });
+              } else {
+                toast({ title: "Password updated" });
+                setNewPassword("");
+                setConfirmPassword("");
+              }
+            }}
+            disabled={passwordLoading || !newPassword || !confirmPassword}
+            className="w-full gap-2"
+          >
+            {passwordLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            Update password
+          </Button>
+        </div>
+
         {/* Sign out */}
-        <div className="mt-12 border-t border-border pt-6">
+        <div className="mt-8 border-t border-border pt-6">
           <Button variant="outline" className="w-full gap-2" onClick={handleSignOut}>
             <LogOut className="h-4 w-4" />
             Sign out
