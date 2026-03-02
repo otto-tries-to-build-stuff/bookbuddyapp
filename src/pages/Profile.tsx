@@ -21,21 +21,21 @@ const ProfilePage = () => {
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile"],
-    queryFn: fetchProfile,
+    queryFn: fetchProfile
   });
 
   const [name, setName] = useState<string | null>(null);
   const displayName = name ?? profile?.name ?? "";
 
   const updateMutation = useMutation({
-    mutationFn: (data: { name?: string; avatar_url?: string }) =>
-      updateProfile(profile!.id, data),
+    mutationFn: (data: {name?: string;avatar_url?: string;}) =>
+    updateProfile(profile!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       toast({ title: "Profile updated" });
     },
     onError: (e) =>
-      toast({ title: "Error", description: e.message, variant: "destructive" }),
+    toast({ title: "Error", description: e.message, variant: "destructive" })
   });
 
   const avatarMutation = useMutation({
@@ -49,7 +49,7 @@ const ProfilePage = () => {
       toast({ title: "Avatar updated" });
     },
     onError: (e) =>
-      toast({ title: "Upload failed", description: e.message, variant: "destructive" }),
+    toast({ title: "Upload failed", description: e.message, variant: "destructive" })
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,8 +71,8 @@ const ProfilePage = () => {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -81,8 +81,8 @@ const ProfilePage = () => {
         <div className="mx-auto flex max-w-lg items-center gap-3">
           <Link
             to="/"
-            className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary"
-          >
+            className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary">
+
             <ArrowLeft className="h-5 w-5" />
           </Link>
         </div>
@@ -95,9 +95,9 @@ const ProfilePage = () => {
         <div className="mb-8 flex flex-col items-center gap-4">
           <div className="relative">
             <Avatar className="h-28 w-28 border-2 border-border">
-              {profile?.avatar_url ? (
-                <AvatarImage src={profile.avatar_url} alt="Profile avatar" />
-              ) : null}
+              {profile?.avatar_url ?
+              <AvatarImage src={profile.avatar_url} alt="Profile avatar" /> :
+              null}
               <AvatarFallback className="bg-secondary text-muted-foreground">
                 <User className="h-10 w-10" />
               </AvatarFallback>
@@ -105,28 +105,28 @@ const ProfilePage = () => {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={avatarMutation.isPending}
-              className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
-            >
-              {avatarMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Camera className="h-4 w-4" />
-              )}
+              className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50">
+
+              {avatarMutation.isPending ?
+              <Loader2 className="h-4 w-4 animate-spin" /> :
+
+              <Camera className="h-4 w-4" />
+              }
             </button>
             <input
               ref={fileInputRef}
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="hidden"
-            />
+              className="hidden" />
+
           </div>
-          {profile?.name && (
-            <p className="text-lg font-medium text-foreground">{profile.name}</p>
-          )}
-          {user?.email && (
-            <p className="text-sm text-muted-foreground">{user.email}</p>
-          )}
+          {profile?.name &&
+          <p className="text-lg font-medium text-foreground">{profile.name}</p>
+          }
+          {user?.email &&
+          <p className="text-sm text-muted-foreground">{user.email}</p>
+          }
         </div>
 
         {/* Name */}
@@ -137,30 +137,30 @@ const ProfilePage = () => {
               id="name"
               placeholder="Enter your name"
               value={displayName}
-              onChange={(e) => setName(e.target.value)}
-            />
+              onChange={(e) => setName(e.target.value)} />
+
           </div>
           <Button
             onClick={handleSaveName}
             disabled={
-              updateMutation.isPending ||
-              !displayName.trim() ||
-              displayName.trim() === profile?.name
+            updateMutation.isPending ||
+            !displayName.trim() ||
+            displayName.trim() === profile?.name
             }
-            className="w-full gap-2"
-          >
-            {updateMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4" />
-            )}
+            className="w-full gap-2">
+
+            {updateMutation.isPending ?
+            <Loader2 className="h-4 w-4 animate-spin" /> :
+
+            <Save className="h-4 w-4" />
+            }
             Save
           </Button>
         </div>
 
         {/* Change password */}
         <div className="mt-8 space-y-4 border-t border-border pt-6">
-          <h2 className="text-lg font-medium text-foreground">Change password</h2>
+          <h2 className="text-lg font-medium text-foreground font-sans">Change password</h2>
           <div className="space-y-2">
             <Label htmlFor="new-password">New password</Label>
             <Input
@@ -168,8 +168,8 @@ const ProfilePage = () => {
               type="password"
               placeholder="At least 6 characters"
               value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
+              onChange={(e) => setNewPassword(e.target.value)} />
+
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirm-password">Confirm password</Label>
@@ -178,8 +178,8 @@ const ProfilePage = () => {
               type="password"
               placeholder="Re-enter new password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
+              onChange={(e) => setConfirmPassword(e.target.value)} />
+
           </div>
           <Button
             onClick={async () => {
@@ -203,8 +203,8 @@ const ProfilePage = () => {
               }
             }}
             disabled={passwordLoading || !newPassword || !confirmPassword}
-            className="w-full gap-2"
-          >
+            className="w-full gap-2">
+
             {passwordLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             Update password
           </Button>
@@ -218,8 +218,8 @@ const ProfilePage = () => {
           </Button>
         </div>
       </main>
-    </div>
-  );
+    </div>);
+
 };
 
 export default ProfilePage;
