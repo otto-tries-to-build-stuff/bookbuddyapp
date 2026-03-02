@@ -1,26 +1,26 @@
 
 
-## Add Change Password to Profile Page
+## Remove Home Page and Update Library as Default
 
-Add a "Change password" section to the existing profile page, allowing authenticated users to update their password directly.
+### Changes
 
-### What you'll see
+**1. Update routing (`src/App.tsx`)**
+- Change the `/` route to render `Index` (library) instead of `Home`
+- Remove the `/library` route (library is now at `/`)
+- Remove the `Home` import
+- Keep all other routes unchanged
 
-A new section on the profile page (between the name editor and sign-out button) with:
-- New password field
-- Confirm password field
-- "Update password" button
-- Validation: passwords must match and be at least 6 characters
-- Success/error toast notifications
+**2. Update library page header (`src/pages/Index.tsx`)**
+- Replace the back arrow (`ArrowLeft` link to `/`) with a profile avatar button (link to `/profile`)
+- Use the same `Avatar` component pattern from the current Home page
+- Fetch the user profile with `useQuery` to show the avatar image
+- Import `Avatar`, `AvatarImage`, `AvatarFallback` from UI components, `User` icon, and `fetchProfile` from api
 
-### Technical Details
+**3. Update navigation links across the app**
+- `src/pages/BookDetail.tsx`: Update back link from `/library` to `/`
+- `src/pages/Chat.tsx` / `src/components/ChatSidebar.tsx`: Update any links pointing to `/library` to `/`
+- Any other references to `/library` route
 
-**Modified file: `src/pages/Profile.tsx`**
-- Add two password state variables (`newPassword`, `confirmPassword`)
-- Add a form section with password inputs and submit button
-- Use the existing `updatePassword` method from `useAuth` hook (already implemented)
-- Clear the fields on success
-- Client-side validation: match check + minimum length
-
-No database changes or new files needed -- the `updatePassword` function in `useAuth.tsx` already calls `supabase.auth.updateUser({ password })`.
+**4. Clean up**
+- Delete `src/pages/Home.tsx` (no longer needed)
 
