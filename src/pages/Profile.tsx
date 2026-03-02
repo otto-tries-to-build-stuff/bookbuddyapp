@@ -89,7 +89,7 @@ const ProfilePage = () => {
       </header>
 
       <main className="mx-auto max-w-lg px-4 pb-16 pt-8 sm:px-6">
-        <h1 className="mb-8 text-3xl font-sans">Your profile</h1>
+        <h1 className="mb-8 text-3xl font-sans font-medium">Your profile</h1>
 
         {/* Avatar */}
         <div className="mb-8 flex flex-col items-center gap-4">
