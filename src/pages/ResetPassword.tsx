@@ -59,14 +59,12 @@ export default function ResetPasswordPage() {
           <CardDescription>
             {ready ? "Enter your new password below." : "Processing your reset link…"}
           </CardDescription>
-          {!ready && (
-            <Alert className="mt-3">
-              <Info className="h-4 w-4" />
-              <AlertDescription>
-                Didn't receive the email? Check your spam or junk folder.
-              </AlertDescription>
-            </Alert>
-          )}
+          <Alert className="mt-3">
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              Didn't receive the email? Check your spam or junk folder.
+            </AlertDescription>
+          </Alert>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
