@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Info, Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function ResetPasswordPage() {
@@ -58,6 +59,14 @@ export default function ResetPasswordPage() {
           <CardDescription>
             {ready ? "Enter your new password below." : "Processing your reset link…"}
           </CardDescription>
+          {!ready && (
+            <Alert className="mt-3">
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Didn't receive the email? Check your spam or junk folder.
+              </AlertDescription>
+            </Alert>
+          )}
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
