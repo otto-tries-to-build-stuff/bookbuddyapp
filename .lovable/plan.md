@@ -1,26 +1,14 @@
 
 
-## Remove Home Page and Update Library as Default
+## Add Spam Folder Notice to Reset Password Page
+
+Add a small informational note below the card description on the reset password page, reminding users to check their spam/junk folder if they don't see the reset email.
 
 ### Changes
 
-**1. Update routing (`src/App.tsx`)**
-- Change the `/` route to render `Index` (library) instead of `Home`
-- Remove the `/library` route (library is now at `/`)
-- Remove the `Home` import
-- Keep all other routes unchanged
-
-**2. Update library page header (`src/pages/Index.tsx`)**
-- Replace the back arrow (`ArrowLeft` link to `/`) with a profile avatar button (link to `/profile`)
-- Use the same `Avatar` component pattern from the current Home page
-- Fetch the user profile with `useQuery` to show the avatar image
-- Import `Avatar`, `AvatarImage`, `AvatarFallback` from UI components, `User` icon, and `fetchProfile` from api
-
-**3. Update navigation links across the app**
-- `src/pages/BookDetail.tsx`: Update back link from `/library` to `/`
-- `src/pages/Chat.tsx` / `src/components/ChatSidebar.tsx`: Update any links pointing to `/library` to `/`
-- Any other references to `/library` route
-
-**4. Clean up**
-- Delete `src/pages/Home.tsx` (no longer needed)
+**Modified file: `src/pages/ResetPassword.tsx`**
+- Add an `Alert` component (using the existing `src/components/ui/alert.tsx`) below the `CardDescription` inside `CardHeader`
+- The alert will contain a brief message: "Didn't receive the email? Check your spam or junk folder."
+- Use the `Info` icon from `lucide-react` for visual clarity
+- Only show this note while waiting for the recovery token (i.e., when `ready` is `false`), since that's when the user has just arrived from their email
 
