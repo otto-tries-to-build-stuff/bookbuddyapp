@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Mail } from "lucide-react";
+import homescreenBook from "@/assets/homescreen-book.png";
 
 export default function AuthPage() {
   const { session, loading, signIn, signUp, resetPassword } = useAuth();
@@ -120,7 +121,10 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
+      <div className="mb-6 h-48 w-48">
+        <img src="/lovable-uploads/56195569-8c38-43f8-bec7-173d30014769.png" alt="Book" className="h-full w-full object-contain" />
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">BookBuddy</CardTitle>
