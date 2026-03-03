@@ -189,6 +189,11 @@ export default function AuthPage() {
           </Tabs>
         </CardContent>
       </Card>
+      <div className="mt-6">
+        <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          About BookBuddy
+        </Link>
+      </div>
     </div>
   );
 }

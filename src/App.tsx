@@ -11,6 +11,7 @@ import Chat from "./pages/Chat";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
+import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/about" element={<About />} />
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/book/:id" element={<ProtectedRoute><BookDetail /></ProtectedRoute>} />
             <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
