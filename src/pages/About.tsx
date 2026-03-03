@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, BookOpen, MessageSquare, Brain, Search, UserCircle, Sparkles } from "lucide-react";
+import { ArrowLeft, BookOpen, MessageSquare, Brain, Search, UserCircle, BadgeInfo } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -92,7 +92,7 @@ export default function AboutPage({ backTo = "/" }: AboutPageProps) {
         {/* Hero */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-            <Sparkles className="h-7 w-7 text-primary" />
+            <BadgeInfo className="h-7 w-7 text-primary" />
           </div>
           <h1 className="text-3xl font-sans font-medium text-foreground">About BookBuddy</h1>
           <p className="mt-2 text-muted-foreground">
