@@ -1,14 +1,29 @@
 
-## Add Spam Folder Notice to Forgot Password Form on Auth Page
 
-The notice was previously added to `/reset-password` (where users set a new password), but the user wants it on the forgot password form within `/auth` (where users request the reset link). This is the form shown in the screenshot.
+# Library Search/Filter
 
-### Change
+## How it works
 
-**Modified file: `src/pages/Auth.tsx`**
-- Import `Alert`, `AlertDescription` from `@/components/ui/alert` and `Info` from `lucide-react`
-- Add an `Alert` component inside the `CardHeader` of the `showForgot` block (after `CardDescription`), displaying: "Didn't receive the email? Check your spam or junk folder."
-- This will be permanently visible on the forgot password form
+A search input appears at the top of the book list on the home screen. As the user types, books are filtered instantly (client-side) by matching the query against both title and author (case-insensitive). No API calls — it filters the already-fetched `books` array.
 
-**Optional cleanup: `src/pages/ResetPassword.tsx`**
-- Remove the Alert from the ResetPassword page since it's less relevant there (user has already found the email at that point). If you'd prefer to keep it in both places, we can do that too.
+## UX
+
+- The search bar only appears when the library has at least 1 book (no point showing it on an empty library)
+- Compact input with a `Search` icon, placed between the heading and the book grid
+- Filtering is instant as the user types — no submit button needed
+- The subtitle updates contextually: "3 of 12 books" when filtering, "12 books" when not
+- If no books match, a small inline empty state says "No books match your search" instead of the full empty-library state
+- Clearing the input (or the × button) restores the full list
+
+## Changes
+
+**`src/pages/Index.tsx`** only:
+1. Add `searchQuery` state
+2. Derive `filteredBooks` from `books` using a case-insensitive match on `title` and `author`
+3. Add a search `Input` with `Search` icon between the heading and grid (conditionally rendered when `books.length > 0`)
+4. Render `filteredBooks` instead of `books` in the grid
+5. Update the subtitle to show filtered count vs total when a search is active
+6. Add a "no matches" state distinct from the "empty library" state
+
+No other files need changes — this is entirely contained in the Index page.
+
