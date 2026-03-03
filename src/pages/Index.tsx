@@ -2,7 +2,7 @@ import { useState } from "react";
 import bookmindLogo from "@/assets/bookmind-logo.png";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { Plus, BookOpen, MessageCircle, Trash2, Loader2, User } from "lucide-react";
+import { Plus, BookOpen, MessageCircle, Trash2, Loader2, User, Search, X } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { fetchProfile } from "@/lib/api";
 import { BookSearchInput } from "@/components/BookSearchInput";
@@ -40,6 +40,7 @@ const Index = () => {
   const [coverId, setCoverId] = useState<number | null>(null);
   const [editionKey, setEditionKey] = useState<string | null>(null);
   const [manualMode, setManualMode] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: books = [], isLoading } = useQuery({
     queryKey: ["books"],
@@ -64,6 +65,11 @@ const Index = () => {
     },
     onError: (e) => toast({ title: "Error", description: e.message, variant: "destructive" })
   });
+
+  const query = searchQuery.toLowerCase();
+  const filteredBooks = query
+    ? books.filter((b) => b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query))
+    : books;
 
   const deleteMutation = useMutation({
     mutationFn: deleteBook,
@@ -184,9 +190,31 @@ const Index = () => {
         <div className="mb-6 mt-4">
           <h1 className="text-3xl sm:text-4xl font-sans font-medium">What are you reading?</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {books.length} {books.length === 1 ? "book" : "books"} in your library
+            {searchQuery && books.length > 0
+              ? `${filteredBooks.length} of ${books.length} ${books.length === 1 ? "book" : "books"}`
+              : `${books.length} ${books.length === 1 ? "book" : "books"} in your library`}
           </p>
         </div>
+
+        {books.length > 0 && (
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search by title or author…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-9"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        )}
 
         {isLoading ?
         <div className="flex justify-center py-20">
@@ -198,9 +226,14 @@ const Index = () => {
             <p className="text-lg text-muted-foreground">Your library is empty</p>
             <p className="text-sm text-muted-foreground/70">Add your first book to get started</p>
           </div> :
+        filteredBooks.length === 0 ?
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-16 text-center">
+            <Search className="mb-3 h-8 w-8 text-muted-foreground/50" />
+            <p className="text-muted-foreground">No books match your search</p>
+          </div> :
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {books.map((book) =>
+            {filteredBooks.map((book) =>
           <BookCard key={book.id} book={book} onDelete={() => deleteMutation.mutate(book.id)} />
           )}
           </div>
