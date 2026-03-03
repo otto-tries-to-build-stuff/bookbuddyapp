@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Camera, Loader2, LogOut, Save, User } from "lucide-react";
+import { ArrowLeft, Camera, Info, Loader2, LogOut, Save, User } from "lucide-react";
 import { fetchProfile, updateProfile, uploadAvatar, type Profile } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -210,8 +210,14 @@ const ProfilePage = () => {
           </Button>
         </div>
 
-        {/* Sign out */}
-        <div className="mt-8 border-t border-border pt-6">
+        {/* About & Sign out */}
+        <div className="mt-8 space-y-3 border-t border-border pt-6">
+          <Button variant="outline" className="w-full gap-2" asChild>
+            <Link to="/about">
+              <Info className="h-4 w-4" />
+              About BookBuddy
+            </Link>
+          </Button>
           <Button variant="outline" className="w-full gap-2" onClick={handleSignOut}>
             <LogOut className="h-4 w-4" />
             Sign out
