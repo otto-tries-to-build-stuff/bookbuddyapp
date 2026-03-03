@@ -1,11 +1,13 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Camera, Info, Loader2, LogOut, Save, User } from "lucide-react";
+import { ArrowLeft, Camera, Info, Loader2, LogOut, Moon, Save, Sun, User } from "lucide-react";
+import { useTheme } from "next-themes";
 import { fetchProfile, updateProfile, uploadAvatar, type Profile } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 const ProfilePage = () => {
   const { toast } = useToast();
   const { user, signOut, updatePassword } = useAuth();
+  const { resolvedTheme, setTheme } = useTheme();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordLoading, setPasswordLoading] = useState(false);
@@ -208,6 +211,25 @@ const ProfilePage = () => {
             {passwordLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             Update password
           </Button>
+        </div>
+
+        {/* Appearance */}
+        <div className="mt-8 border-t border-border pt-6">
+          <h2 className="mb-4 text-lg font-medium text-foreground font-sans">Appearance</h2>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {resolvedTheme === "dark" ? (
+                <Moon className="h-5 w-5 text-muted-foreground" />
+              ) : (
+                <Sun className="h-5 w-5 text-muted-foreground" />
+              )}
+              <span className="text-sm text-foreground">Dark mode</span>
+            </div>
+            <Switch
+              checked={resolvedTheme === "dark"}
+              onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+            />
+          </div>
         </div>
 
         {/* About & Sign out */}
