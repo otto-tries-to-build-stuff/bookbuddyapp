@@ -10,6 +10,7 @@ import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Camera, Info, Loader2, LogOut, Moon, Save, Sun, User } from "lucide-react";
+import AvatarCropDialog from "@/components/AvatarCropDialog";
 import { useTheme } from "next-themes";
 import { fetchProfile, updateProfile, uploadAvatar, type Profile } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,8 @@ const ProfilePage = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordLoading, setPasswordLoading] = useState(false);
+  const [cropFile, setCropFile] = useState<File | null>(null);
+  const [cropOpen, setCropOpen] = useState(false);
 
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -68,7 +71,23 @@ const ProfilePage = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) avatarMutation.mutate(file);
+    if (file) {
+      setCropFile(file);
+      setCropOpen(true);
+    }
+    // Reset input so the same file can be re-selected
+    e.target.value = "";
+  };
+
+  const handleCropConfirm = (croppedFile: File) => {
+    setCropOpen(false);
+    setCropFile(null);
+    avatarMutation.mutate(croppedFile);
+  };
+
+  const handleCropCancel = () => {
+    setCropOpen(false);
+    setCropFile(null);
   };
 
   const handleSaveName = () => {
@@ -270,6 +289,13 @@ const ProfilePage = () => {
           </div>
         </div>
       </main>
+
+      <AvatarCropDialog
+        file={cropFile}
+        open={cropOpen}
+        onConfirm={handleCropConfirm}
+        onCancel={handleCropCancel}
+      />
     </div>
   );
 };
