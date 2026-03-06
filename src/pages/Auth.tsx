@@ -162,15 +162,13 @@ export default function AuthPage() {
   // ── View 3: Main Sign In / Sign Up Tabs ──
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
-      {/* App logo/illustration */}
-      <div className="mb-6 h-48 w-48">
-        <img src="/lovable-uploads/56195569-8c38-43f8-bec7-173d30014769.png" alt="Book" className="h-full w-full object-contain" />
-      </div>
-
-      <p className="mb-4 text-lg font-medium text-foreground">Hi there 👋</p>
+      <p className="mb-6 text-5xl font-medium text-foreground">Hi there 👋</p>
 
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
+          <div className="mx-auto mb-2 h-48 w-48">
+            <img src="/lovable-uploads/56195569-8c38-43f8-bec7-173d30014769.png" alt="Book" className="h-full w-full object-contain" />
+          </div>
           <CardTitle className="text-2xl">BookBuddy</CardTitle>
           <CardDescription>Your AI-powered reading companion</CardDescription>
         </CardHeader>
