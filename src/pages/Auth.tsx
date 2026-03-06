@@ -167,6 +167,8 @@ export default function AuthPage() {
         <img src="/lovable-uploads/56195569-8c38-43f8-bec7-173d30014769.png" alt="Book" className="h-full w-full object-contain" />
       </div>
 
+      <p className="mb-4 text-lg font-medium text-foreground">Hi there 👋</p>
+
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">BookBuddy</CardTitle>
