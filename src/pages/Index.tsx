@@ -225,7 +225,7 @@ const Index = () => {
       <main className="mx-auto max-w-lg md:max-w-3xl lg:max-w-5xl px-4 pb-10 sm:px-6">
         {/* Page heading and book count */}
         <div className="mb-6 mt-4">
-          <h1 className="text-3xl sm:text-4xl font-sans font-medium">What are you reading?</h1>
+          <h1 className="text-3xl sm:text-4xl font-sans font-medium">📖 What are you reading?</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {searchQuery && books.length > 0
               ? `${filteredBooks.length} of ${books.length} ${books.length === 1 ? "book" : "books"}`
