@@ -190,7 +190,12 @@ export default function AuthPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="si-password">Password</Label>
-                  <Input id="si-password" type="password" required value={email ? password : ""} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+                  <div className="relative">
+                    <Input id="si-password" type={showPassword ? "text" : "password"} required value={email ? password : ""} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="pr-10" />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={busy}>
                   {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
