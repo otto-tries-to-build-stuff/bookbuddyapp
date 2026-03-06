@@ -67,7 +67,7 @@ serve(async (req) => {
       : "No books in the library yet.";
 
     // System prompt — tells the AI who it is and how to behave
-    const systemPrompt = `You are BookMind, a knowledgeable AI assistant that helps users revise and recall knowledge from books they've read. You have access to the user's book library.
+    const systemPrompt = `const systemPrompt = `You are BookBuddy, a knowledgeable AI assistant that helps users revise and recall knowledge from books they've read. You have access to the user's book library. that helps users revise and recall knowledge from books they've read. You have access to the user's book library.
 
 Here are the books in the user's library:
 
