@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Info, Loader2, Mail } from "lucide-react";
+import { Eye, EyeOff, Info, Loader2, Mail } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import homescreenBook from "@/assets/homescreen-book.png";
 
@@ -34,7 +34,8 @@ export default function AuthPage() {
   // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);            // Loading state for form submission
+  const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [showVerification, setShowVerification] = useState(false); // Show "check your email" view
   const [showForgot, setShowForgot] = useState(false);             // Show forgot password form
 
@@ -189,7 +190,12 @@ export default function AuthPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="si-password">Password</Label>
-                  <Input id="si-password" type="password" required value={email ? password : ""} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+                  <div className="relative">
+                    <Input id="si-password" type={showPassword ? "text" : "password"} required value={email ? password : ""} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="pr-10" />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={busy}>
                   {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -210,7 +216,12 @@ export default function AuthPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="su-password">Password</Label>
-                  <Input id="su-password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" minLength={6} />
+                  <div className="relative">
+                    <Input id="su-password" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" minLength={6} className="pr-10" />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={busy}>
                   {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
