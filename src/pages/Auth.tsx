@@ -34,7 +34,8 @@ export default function AuthPage() {
   // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);            // Loading state for form submission
+  const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [showVerification, setShowVerification] = useState(false); // Show "check your email" view
   const [showForgot, setShowForgot] = useState(false);             // Show forgot password form
 
