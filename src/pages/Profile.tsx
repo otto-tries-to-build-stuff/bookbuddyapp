@@ -289,6 +289,13 @@ const ProfilePage = () => {
           </div>
         </div>
       </main>
+
+      <AvatarCropDialog
+        file={cropFile}
+        open={cropOpen}
+        onConfirm={handleCropConfirm}
+        onCancel={handleCropCancel}
+      />
     </div>
   );
 };
