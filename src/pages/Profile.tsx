@@ -71,7 +71,23 @@ const ProfilePage = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) avatarMutation.mutate(file);
+    if (file) {
+      setCropFile(file);
+      setCropOpen(true);
+    }
+    // Reset input so the same file can be re-selected
+    e.target.value = "";
+  };
+
+  const handleCropConfirm = (croppedFile: File) => {
+    setCropOpen(false);
+    setCropFile(null);
+    avatarMutation.mutate(croppedFile);
+  };
+
+  const handleCropCancel = () => {
+    setCropOpen(false);
+    setCropFile(null);
   };
 
   const handleSaveName = () => {
