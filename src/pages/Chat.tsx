@@ -17,7 +17,7 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Send, Loader2, Check, Menu, BookOpen, Copy } from "lucide-react";
 import chatIcon from "@/assets/chat-icon.png";
 import { useIsMobile } from "@/hooks/use-mobile";
