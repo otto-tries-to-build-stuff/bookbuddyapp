@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Info, Loader2, Mail } from "lucide-react";
+import { Eye, EyeOff, Info, Loader2, Mail } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import homescreenBook from "@/assets/homescreen-book.png";
 
