@@ -23,7 +23,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft, BookOpen, Loader2, Save, PenLine, Trash2,
-  RefreshCw, Plus, X, Info } from
+  RefreshCw, Plus, X, Info, MessageSquare } from
 "lucide-react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import {
