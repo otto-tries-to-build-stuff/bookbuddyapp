@@ -1,3 +1,22 @@
+/**
+ * ResetPassword.tsx — Password Reset Page
+ *
+ * This page is shown when a user clicks the password reset link in their email.
+ * The link contains a special token that authenticates the user temporarily.
+ *
+ * How the flow works:
+ * 1. User clicks "Forgot password?" on the Auth page
+ * 2. They receive an email with a reset link pointing to /reset-password
+ * 3. The link contains a token that triggers a PASSWORD_RECOVERY event
+ * 4. This page listens for that event and shows the password form
+ * 5. User enters a new password and submits
+ *
+ * Key concept:
+ * - onAuthStateChange: A listener that fires when auth events happen.
+ *   We use it to detect the PASSWORD_RECOVERY event, which confirms
+ *   the user clicked a valid reset link.
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -18,13 +37,14 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(false);  // True once the reset token is verified
 
   useEffect(() => {
-    // Listen for PASSWORD_RECOVERY event from the URL token
+    // Listen for the PASSWORD_RECOVERY event — this fires when the user
+    // arrives via a valid password reset link
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
-        setReady(true);
+        setReady(true);  // Token is valid, show the form
       }
     });
     return () => subscription.unsubscribe();
@@ -32,6 +52,8 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate that passwords match
     if (password !== confirm) {
       toast({ title: "Passwords don't match", variant: "destructive" });
       return;
@@ -40,14 +62,16 @@ export default function ResetPasswordPage() {
       toast({ title: "Password too short", description: "At least 6 characters required.", variant: "destructive" });
       return;
     }
+
     setBusy(true);
     const { error } = await updatePassword(password);
     setBusy(false);
+
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Password updated", description: "You can now sign in with your new password." });
-      navigate("/");
+      navigate("/");  // Redirect to home page
     }
   };
 

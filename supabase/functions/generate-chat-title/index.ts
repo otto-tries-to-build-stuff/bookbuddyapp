@@ -1,3 +1,18 @@
+/**
+ * Edge Function: generate-chat-title
+ *
+ * This small server-side function generates a short title for a chat conversation
+ * based on the user's first message. For example, if the user asks
+ * "What are the key ideas from Atomic Habits?", the AI might generate
+ * the title "Key Ideas from Atomic Habits".
+ *
+ * It uses a very lightweight AI model (gemini-2.5-flash-lite) since
+ * generating a title is a simple task that doesn't need much processing power.
+ *
+ * If the AI call fails for any reason, it falls back to using the first
+ * 40 characters of the user's message as the title.
+ */
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -6,6 +21,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
@@ -13,6 +29,7 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    // Ask the AI to generate a short title
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -20,7 +37,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "google/gemini-2.5-flash-lite",  // Lightweight model — fast and cheap
         messages: [
           {
             role: "system",
@@ -32,6 +49,7 @@ serve(async (req) => {
       }),
     });
 
+    // If the AI fails, fall back to truncating the message
     if (!response.ok) {
       console.error("AI error:", response.status);
       return new Response(JSON.stringify({ title: message.slice(0, 40) }), {

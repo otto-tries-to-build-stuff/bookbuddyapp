@@ -1,3 +1,20 @@
+/**
+ * About.tsx — About Page
+ *
+ * A static informational page that explains what BookBuddy is and how to use it.
+ * It contains three sections:
+ * 1. Key Features — expandable accordion showing what the app can do
+ * 2. Getting Started — numbered steps for new users
+ * 3. FAQ — common questions and answers
+ *
+ * This page is accessible both before and after login (it's a public route).
+ *
+ * Key concept:
+ * - This is a "presentational" component — it doesn't fetch data or manage state.
+ *   All the content is defined as static arrays (features, steps, faqs) and
+ *   simply rendered. This is the simplest type of React component.
+ */
+
 import { Link } from "react-router-dom";
 import { ArrowLeft, BookOpen, MessageSquare, Brain, Search, UserCircle, Sparkles } from "lucide-react";
 import {
@@ -7,6 +24,7 @@ import {
   AccordionTrigger } from
 "@/components/ui/accordion";
 
+// Static data arrays — these define the page content
 const features = [
 {
   icon: BookOpen,
@@ -71,12 +89,13 @@ const faqs = [
 
 
 interface AboutPageProps {
-  backTo?: string;
+  backTo?: string;  // Which page the back button navigates to (defaults to home)
 }
 
 export default function AboutPage({ backTo = "/" }: AboutPageProps) {
   return (
     <div className="min-h-screen bg-background">
+      {/* Header with back button */}
       <header className="px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-lg items-center gap-3">
           <Link
@@ -89,7 +108,7 @@ export default function AboutPage({ backTo = "/" }: AboutPageProps) {
       </header>
 
       <main className="mx-auto max-w-lg px-4 pb-16 pt-4 sm:px-6">
-        {/* Hero */}
+        {/* Hero section */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
             <Sparkles className="h-7 w-7 text-primary" />
@@ -100,7 +119,7 @@ export default function AboutPage({ backTo = "/" }: AboutPageProps) {
           </p>
         </div>
 
-        {/* Features */}
+        {/* Key Features — each feature expands to show its description */}
         <section className="mb-8">
           <h2 className="mb-3 text-lg font-sans font-medium text-foreground">Key Features</h2>
           <Accordion type="multiple" className="w-full">
@@ -120,7 +139,7 @@ export default function AboutPage({ backTo = "/" }: AboutPageProps) {
           </Accordion>
         </section>
 
-        {/* Getting Started */}
+        {/* Getting Started — numbered steps */}
         <section className="mb-8">
           <h2 className="mb-3 text-lg font-sans font-medium text-foreground">Getting Started</h2>
           <ol className="space-y-3">
@@ -135,7 +154,7 @@ export default function AboutPage({ backTo = "/" }: AboutPageProps) {
           </ol>
         </section>
 
-        {/* FAQ */}
+        {/* FAQ — expandable questions and answers */}
         <section>
           <h2 className="mb-3 text-lg font-sans font-medium text-foreground">FAQ</h2>
           <Accordion type="multiple" className="w-full">
