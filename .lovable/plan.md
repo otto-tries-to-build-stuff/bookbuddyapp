@@ -1,29 +1,34 @@
 
 
-# Library Search/Filter
+## Avatar Crop & Position Adjustment
 
-## How it works
+When the user selects a new profile photo, instead of uploading immediately, we'll show a **dialog with an interactive cropper** that lets them pan and zoom the image within a circular frame before confirming.
 
-A search input appears at the top of the book list on the home screen. As the user types, books are filtered instantly (client-side) by matching the query against both title and author (case-insensitive). No API calls — it filters the already-fetched `books` array.
+### Approach
 
-## UX
+1. **New component: `AvatarCropDialog.tsx`**
+   - Opens as a Dialog when a file is selected
+   - Displays the selected image in a draggable/zoomable container
+   - Circular crop mask overlay (CSS-based)
+   - Zoom slider control
+   - Pan by click-and-drag on the image
+   - "Cancel" and "Confirm" buttons
+   - On confirm, uses an off-screen `<canvas>` to crop the visible area into a square image, converts to a Blob, and returns it
 
-- The search bar only appears when the library has at least 1 book (no point showing it on an empty library)
-- Compact input with a `Search` icon, placed between the heading and the book grid
-- Filtering is instant as the user types — no submit button needed
-- The subtitle updates contextually: "3 of 12 books" when filtering, "12 books" when not
-- If no books match, a small inline empty state says "No books match your search" instead of the full empty-library state
-- Clearing the input (or the × button) restores the full list
+2. **Update `Profile.tsx`**
+   - `handleFileChange` no longer uploads immediately — instead stores the raw file in state and opens the crop dialog
+   - On dialog confirm, receives the cropped Blob, wraps it as a File, and passes it to the existing `avatarMutation`
+   - On cancel, clears the file state
 
-## Changes
+3. **No new dependencies** — built with native browser APIs:
+   - `<canvas>` for cropping
+   - CSS `object-fit` + `transform: translate/scale` for pan/zoom
+   - Pointer events for drag interaction
+   - Radix Dialog (already installed) for the modal
 
-**`src/pages/Index.tsx`** only:
-1. Add `searchQuery` state
-2. Derive `filteredBooks` from `books` using a case-insensitive match on `title` and `author`
-3. Add a search `Input` with `Search` icon between the heading and grid (conditionally rendered when `books.length > 0`)
-4. Render `filteredBooks` instead of `books` in the grid
-5. Update the subtitle to show filtered count vs total when a search is active
-6. Add a "no matches" state distinct from the "empty library" state
-
-No other files need changes — this is entirely contained in the Index page.
+### Crop Dialog UX
+- Image fills the dialog with a **circular semi-transparent mask** showing the crop area
+- **Zoom**: slider at the bottom (1x–3x)
+- **Pan**: click and drag the image
+- Output: 400×400px square PNG cropped from the visible circle area
 
