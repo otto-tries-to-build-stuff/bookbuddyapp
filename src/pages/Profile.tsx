@@ -274,6 +274,9 @@ const ProfilePage = () => {
               </div>
             </div>
 
+            {/* Feedback */}
+            <FeedbackForm />
+
             {/* About & Sign out */}
             <div className="mt-8 space-y-3 border-t border-border pt-6">
               <Button variant="outline" className="w-full gap-2" asChild>
