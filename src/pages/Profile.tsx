@@ -131,7 +131,7 @@ const ProfilePage = () => {
           <div className="mb-8 md:mb-0">
             <div className="md:sticky md:top-8">
               <Card className="border-0 shadow-none md:border md:shadow-sm">
-                <CardContent className="flex flex-col items-center gap-4 px-0 py-2 md:p-6">
+                <CardContent className="flex flex-col items-center gap-4 px-0 py-6 md:p-6">
                   <div className="relative">
                     <Avatar className="h-28 w-28 border-2 border-border">
                       {profile?.avatar_url ? (
