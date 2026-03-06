@@ -182,6 +182,16 @@ const BookDetail = () => {
           <Link to="/" className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary">
             <ArrowLeft className="h-5 w-5" />
           </Link>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-foreground"
+              onClick={() => navigate(`/chat?bookId=${book.id}`)}
+              title="Chat about this book"
+            >
+              <MessageSquare className="h-4.5 w-4.5" />
+            </Button>
           {/* Delete button with confirmation dialog */}
           <AlertDialog>
             <AlertDialogTrigger asChild>
