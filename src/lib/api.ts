@@ -538,3 +538,21 @@ export async function streamChat({
 
   onDone();  // Signal that the stream is complete
 }
+
+// ═══════════════════════════════════════════════
+// ── FEEDBACK ──
+// ═══════════════════════════════════════════════
+
+/**
+ * Submit user feedback (bug report, suggestion, or general comment).
+ */
+export async function submitFeedback(
+  message: string,
+  category: "bug" | "suggestion" | "general"
+): Promise<void> {
+  const userId = await getUserId();
+  const { error } = await supabase
+    .from("feedback" as any)
+    .insert({ user_id: userId, message, category } as any);
+  if (error) throw error;
+}
