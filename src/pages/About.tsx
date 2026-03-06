@@ -1,18 +1,10 @@
 /**
  * About.tsx — About Page
  *
- * A static informational page that explains what BookBuddy is and how to use it.
- * It contains three sections:
- * 1. Key Features — expandable accordion showing what the app can do
- * 2. Getting Started — numbered steps for new users
- * 3. FAQ — common questions and answers
- *
- * This page is accessible both before and after login (it's a public route).
- *
- * Key concept:
- * - This is a "presentational" component — it doesn't fetch data or manage state.
- *   All the content is defined as static arrays (features, steps, faqs) and
- *   simply rendered. This is the simplest type of React component.
+ * Responsive layout:
+ * - Mobile: single-column with accordions
+ * - Desktop (md+): two-column layout with sticky hero on the left,
+ *   features as a card grid, and Getting Started / FAQ on the right
  */
 
 import { Link } from "react-router-dom";
@@ -21,154 +13,194 @@ import {
   Accordion,
   AccordionContent,
   AccordionItem,
-  AccordionTrigger } from
-"@/components/ui/accordion";
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Card, CardContent } from "@/components/ui/card";
 
-// Static data arrays — these define the page content
 const features = [
-{
-  icon: BookOpen,
-  title: "Build Your Library",
-  description:
-  "Search for any book and add it to your personal library. BookBuddy pulls in cover art, author info, and details automatically so your collection stays organised."
-},
-{
-  icon: Brain,
-  title: "AI-Generated Summaries",
-  description:
-  "Get concise, AI-powered summaries and key learnings for every book in your library — perfect for quick refreshers or deciding what to read next."
-},
-{
-  icon: MessageSquare,
-  title: "Chat About Your Books",
-  description:
-  "Start a conversation with the AI about any book in your library. Ask questions, explore themes, or get reading recommendations based on what you've read."
-},
-{
-  icon: Search,
-  title: "Discover New Books",
-  description:
-  "Use the search bar to find books by title or author. Browse results, preview details, and add anything that catches your eye."
-},
-{
-  icon: UserCircle,
-  title: "Your Profile",
-  description:
-  "Personalise your account with a name and avatar. You can also update your password from the profile page."
-}];
-
+  {
+    icon: BookOpen,
+    title: "Build Your Library",
+    description:
+      "Search for any book and add it to your personal library. BookBuddy pulls in cover art, author info, and details automatically so your collection stays organised.",
+  },
+  {
+    icon: Brain,
+    title: "AI-Generated Summaries",
+    description:
+      "Get concise, AI-powered summaries and key learnings for every book in your library — perfect for quick refreshers or deciding what to read next.",
+  },
+  {
+    icon: MessageSquare,
+    title: "Chat About Your Books",
+    description:
+      "Start a conversation with the AI about any book in your library. Ask questions, explore themes, or get reading recommendations based on what you've read.",
+  },
+  {
+    icon: Search,
+    title: "Discover New Books",
+    description:
+      "Use the search bar to find books by title or author. Browse results, preview details, and add anything that catches your eye.",
+  },
+  {
+    icon: UserCircle,
+    title: "Your Profile",
+    description:
+      "Personalise your account with a name and avatar. You can also update your password from the profile page.",
+  },
+];
 
 const steps = [
-{ step: "1", text: "Sign up and verify your email to create your account." },
-{ step: "2", text: "Search for a book using the search bar on the library page." },
-{ step: "3", text: "Tap a book to view its details, summary, and key learnings." },
-{ step: "4", text: "Open a chat to ask the AI anything about your books." }];
-
+  { step: "1", text: "Sign up and verify your email to create your account." },
+  { step: "2", text: "Search for a book using the search bar on the library page." },
+  { step: "3", text: "Tap a book to view its details, summary, and key learnings." },
+  { step: "4", text: "Open a chat to ask the AI anything about your books." },
+];
 
 const faqs = [
-{
-  q: "Is BookBuddy free to use?",
-  a: "Yes — you can build your library and chat with the AI at no cost."
-},
-{
-  q: "Where does the book data come from?",
-  a: "Book metadata and covers are sourced from the Open Library API."
-},
-{
-  q: "How does the AI chat work?",
-  a: "The AI uses the context of the books in your library to answer questions, provide summaries, and suggest connections between ideas."
-},
-{
-  q: "Can I delete a book from my library?",
-  a: "Yes — open the book's detail page and use the delete option to remove it."
-},
-{
-  q: "Is my data private?",
-  a: "Absolutely. Your library and chat history are tied to your account and are not shared with other users."
-}];
-
+  {
+    q: "Is BookBuddy free to use?",
+    a: "Yes — you can build your library and chat with the AI at no cost.",
+  },
+  {
+    q: "Where does the book data come from?",
+    a: "Book metadata and covers are sourced from the Open Library API.",
+  },
+  {
+    q: "How does the AI chat work?",
+    a: "The AI uses the context of the books in your library to answer questions, provide summaries, and suggest connections between ideas.",
+  },
+  {
+    q: "Can I delete a book from my library?",
+    a: "Yes — open the book's detail page and use the delete option to remove it.",
+  },
+  {
+    q: "Is my data private?",
+    a: "Absolutely. Your library and chat history are tied to your account and are not shared with other users.",
+  },
+];
 
 interface AboutPageProps {
-  backTo?: string;  // Which page the back button navigates to (defaults to home)
+  backTo?: string;
 }
 
 export default function AboutPage({ backTo = "/" }: AboutPageProps) {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header with back button */}
+      {/* Header */}
       <header className="px-4 py-3 sm:px-6">
-        <div className="mx-auto flex max-w-lg items-center gap-3">
+        <div className="mx-auto flex max-w-lg md:max-w-3xl items-center gap-3">
           <Link
             to={backTo}
-            className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary">
-            
+            className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary"
+          >
             <ArrowLeft className="h-5 w-5" />
           </Link>
         </div>
       </header>
 
-      <main className="mx-auto max-w-lg px-4 pb-16 pt-4 sm:px-6">
-        {/* Hero section */}
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-            <Sparkles className="h-7 w-7 text-primary" />
+      <main className="mx-auto max-w-lg md:max-w-3xl px-4 pb-16 pt-4 sm:px-6">
+        {/* Two-column grid on desktop */}
+        <div className="md:grid md:grid-cols-[260px_1fr] md:gap-10">
+          {/* Left column — Hero (sticky on desktop) */}
+          <div className="mb-8 md:mb-0">
+            <div className="md:sticky md:top-8">
+              <div className="text-center md:text-left">
+                <div className="mx-auto md:mx-0 mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+                  <Sparkles className="h-7 w-7 text-primary" />
+                </div>
+                <h1 className="text-3xl font-sans font-medium text-foreground">
+                  About BookBuddy
+                </h1>
+                <p className="mt-2 text-muted-foreground">
+                  Your AI-powered reading companion. Build a personal library, get instant
+                  summaries, and chat about your books.
+                </p>
+              </div>
+            </div>
           </div>
-          <h1 className="text-3xl font-sans font-medium text-foreground">About BookBuddy</h1>
-          <p className="mt-2 text-muted-foreground">
-            Your AI-powered reading companion. Build a personal library, get instant summaries, and chat about your books.
-          </p>
+
+          {/* Right column — Content */}
+          <div>
+            {/* Features — accordion on mobile, card grid on desktop */}
+            <section className="mb-8">
+              <h2 className="mb-3 text-lg font-sans font-medium text-foreground">Key Features</h2>
+
+              {/* Mobile: accordion */}
+              <div className="md:hidden">
+                <Accordion type="multiple" className="w-full">
+                  {features.map((f, i) => (
+                    <AccordionItem key={i} value={`feature-${i}`}>
+                      <AccordionTrigger className="text-left">
+                        <span className="flex items-center gap-3">
+                          <f.icon className="h-5 w-5 shrink-0 text-primary" />
+                          <span className="font-sans">{f.title}</span>
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent className="text-muted-foreground pl-8">
+                        {f.description}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
+
+              {/* Desktop: card grid */}
+              <div className="hidden md:grid md:grid-cols-2 gap-4">
+                {features.map((f, i) => (
+                  <Card key={i} className="border shadow-sm">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                          <f.icon className="h-4 w-4 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-sans font-medium text-foreground text-sm">
+                            {f.title}
+                          </h3>
+                          <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                            {f.description}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </section>
+
+            {/* Getting Started */}
+            <section className="mb-8">
+              <h2 className="mb-3 text-lg font-sans font-medium text-foreground">
+                Getting Started
+              </h2>
+              <ol className="space-y-3">
+                {steps.map((s) => (
+                  <li key={s.step} className="flex items-start gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
+                      {s.step}
+                    </span>
+                    <span className="pt-0.5 text-sm text-muted-foreground">{s.text}</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+
+            {/* FAQ */}
+            <section>
+              <h2 className="mb-3 text-lg font-sans font-medium text-foreground">FAQ</h2>
+              <Accordion type="multiple" className="w-full">
+                {faqs.map((f, i) => (
+                  <AccordionItem key={i} value={`faq-${i}`}>
+                    <AccordionTrigger className="text-left">{f.q}</AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground">{f.a}</AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </section>
+          </div>
         </div>
-
-        {/* Key Features — each feature expands to show its description */}
-        <section className="mb-8">
-          <h2 className="mb-3 text-lg font-sans font-medium text-foreground">Key Features</h2>
-          <Accordion type="multiple" className="w-full">
-            {features.map((f, i) =>
-            <AccordionItem key={i} value={`feature-${i}`}>
-                <AccordionTrigger className="text-left">
-                  <span className="flex items-center gap-3">
-                    <f.icon className="h-5 w-5 shrink-0 text-primary" />
-                    <span className="font-sans">{f.title}</span>
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pl-8">
-                  {f.description}
-                </AccordionContent>
-              </AccordionItem>
-            )}
-          </Accordion>
-        </section>
-
-        {/* Getting Started — numbered steps */}
-        <section className="mb-8">
-          <h2 className="mb-3 text-lg font-sans font-medium text-foreground">Getting Started</h2>
-          <ol className="space-y-3">
-            {steps.map((s) =>
-            <li key={s.step} className="flex items-start gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
-                  {s.step}
-                </span>
-                <span className="pt-0.5 text-sm text-muted-foreground">{s.text}</span>
-              </li>
-            )}
-          </ol>
-        </section>
-
-        {/* FAQ — expandable questions and answers */}
-        <section>
-          <h2 className="mb-3 text-lg font-sans font-medium text-foreground">FAQ</h2>
-          <Accordion type="multiple" className="w-full">
-            {faqs.map((f, i) =>
-            <AccordionItem key={i} value={`faq-${i}`}>
-                <AccordionTrigger className="text-left">{f.q}</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
-                  {f.a}
-                </AccordionContent>
-              </AccordionItem>
-            )}
-          </Accordion>
-        </section>
       </main>
-    </div>);
-
+    </div>
+  );
 }
