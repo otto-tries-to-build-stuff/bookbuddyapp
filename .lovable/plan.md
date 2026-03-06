@@ -1,56 +1,29 @@
 
 
-# Plan: Add Learning Comments to All Code Files
+# Library Search/Filter
 
-## Will this cause any issues?
+## How it works
 
-**No performance impact whatsoever.** Comments are completely stripped out during the build process (by Vite and the TypeScript compiler). The final JavaScript that runs in the user's browser will be identical -- comments only exist in the source code for your benefit.
+A search input appears at the top of the book list on the home screen. As the user types, books are filtered instantly (client-side) by matching the query against both title and author (case-insensitive). No API calls — it filters the already-fetched `books` array.
 
-The only minor consideration is that source files become longer to scroll through, but that's a worthwhile trade-off for understanding.
+## UX
 
-## What will be commented
+- The search bar only appears when the library has at least 1 book (no point showing it on an empty library)
+- Compact input with a `Search` icon, placed between the heading and the book grid
+- Filtering is instant as the user types — no submit button needed
+- The subtitle updates contextually: "3 of 12 books" when filtering, "12 books" when not
+- If no books match, a small inline empty state says "No books match your search" instead of the full empty-library state
+- Clearing the input (or the × button) restores the full list
 
-I'll add clear, beginner-friendly comments to every custom file in the project (not the auto-generated UI component library files in `src/components/ui/`, since those are standard library code). Here's the scope:
+## Changes
 
-### Core app files (4 files)
-- **`src/main.tsx`** -- App entry point
-- **`src/App.tsx`** -- Route definitions and global providers
-- **`src/hooks/useAuth.tsx`** -- Authentication logic
-- **`src/lib/api.ts`** -- All database and API calls
+**`src/pages/Index.tsx`** only:
+1. Add `searchQuery` state
+2. Derive `filteredBooks` from `books` using a case-insensitive match on `title` and `author`
+3. Add a search `Input` with `Search` icon between the heading and grid (conditionally rendered when `books.length > 0`)
+4. Render `filteredBooks` instead of `books` in the grid
+5. Update the subtitle to show filtered count vs total when a search is active
+6. Add a "no matches" state distinct from the "empty library" state
 
-### Page components (8 files)
-- **`src/pages/Index.tsx`** -- Home/library screen
-- **`src/pages/BookDetail.tsx`** -- Individual book view
-- **`src/pages/Chat.tsx`** -- AI chat interface
-- **`src/pages/Profile.tsx`** -- User profile & settings
-- **`src/pages/Auth.tsx`** -- Sign in / sign up
-- **`src/pages/ResetPassword.tsx`** -- Password reset
-- **`src/pages/About.tsx`** -- About page
-- **`src/pages/NotFound.tsx`** -- 404 page
-
-### Custom components (4 files)
-- **`src/components/ProtectedRoute.tsx`** -- Auth guard
-- **`src/components/BookSearchInput.tsx`** -- Book search autocomplete
-- **`src/components/ChatSidebar.tsx`** -- Chat history sidebar
-- **`src/components/NavLink.tsx`** -- Navigation link wrapper
-
-### Utility/helper files (3 files)
-- **`src/lib/openLibrary.ts`** -- Open Library API integration
-- **`src/lib/utils.ts`** -- Tailwind class merging utility
-- **`src/hooks/use-debounce.ts`** -- Debounce hook
-
-### Backend functions (3 files)
-- **`supabase/functions/chat/index.ts`** -- AI chat endpoint
-- **`supabase/functions/generate-book-summary/index.ts`** -- Book summary generation
-- **`supabase/functions/generate-chat-title/index.ts`** -- Auto chat title generation
-
-## Comment style
-
-Each file will get:
-1. A **file-level comment** at the top explaining what the file does and why it exists
-2. **Inline comments** on key sections explaining concepts like: what React hooks do, how data flows, what API calls accomplish, why certain patterns are used (e.g. mutations, queries, state)
-
-Comments will use plain English, avoiding jargon where possible, and will explain *why* not just *what*.
-
-## Total: ~22 files to comment
+No other files need changes — this is entirely contained in the Index page.
 

@@ -1,3 +1,23 @@
+/**
+ * BookDetail.tsx — Individual Book View
+ *
+ * This page shows all the details for a single book:
+ * - Cover image, title, and author
+ * - AI-generated summary (editable)
+ * - Key takeaways/lessons (editable, expandable accordion)
+ * - Personal notes section
+ *
+ * The user can also:
+ * - Edit the summary, key lessons, or personal notes
+ * - Regenerate the AI summary
+ * - Delete the book
+ *
+ * Key concepts:
+ * - useParams: Gets the book ID from the URL (e.g. /book/abc123 → id = "abc123")
+ * - useMutation: Handles save/delete operations with loading states
+ * - Accordion: An expandable/collapsible list component
+ */
+
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -24,37 +44,45 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
 const BookDetail = () => {
+  // Extract the book ID from the URL path (e.g. /book/abc123)
   const { id } = useParams<{id: string;}>();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
+  // Fetch all books and find the one matching our ID
+  // We reuse the "books" query instead of fetching a single book
+  // so the data stays in sync with the library page
   const { data: books = [], isLoading } = useQuery({
     queryKey: ["books"],
     queryFn: fetchBooks
   });
   const book = books.find((b) => b.id === id);
 
-  // Notes state
+  // ── Local state for editing ──
+
+  // Notes editing
   const [notes, setNotes] = useState(book?.notes ?? "");
   const [editing, setEditing] = useState(false);
 
-  // Editable summary state
+  // Summary editing
   const [editingSummary, setEditingSummary] = useState(false);
   const [editingSummaryText, setEditingSummaryText] = useState("");
 
-  // Editable lessons state
+  // Key lessons editing
   const [editingLessons, setEditingLessons] = useState(false);
   const [editingLessonsData, setEditingLessonsData] = useState<KeyLesson[]>([]);
 
+  // Sync notes state when book data changes (e.g. after save)
   useEffect(() => {
     if (book) {
       setNotes(book.notes ?? "");
     }
   }, [book]);
 
-  // --- Mutations ---
+  // ── Mutations (write operations) ──
 
+  // Delete the book and navigate back to the library
   const deleteMutation = useMutation({
     mutationFn: () => deleteBook(id!),
     onSuccess: () => {
@@ -65,6 +93,7 @@ const BookDetail = () => {
     onError: (e) => toast({ title: "Error deleting book", description: e.message, variant: "destructive" })
   });
 
+  // Save personal notes
   const notesMutation = useMutation({
     mutationFn: () => updateBookNotes(id!, notes),
     onSuccess: () => {
@@ -75,6 +104,7 @@ const BookDetail = () => {
     onError: (e) => toast({ title: "Error saving notes", description: e.message, variant: "destructive" })
   });
 
+  // Save edited summary
   const summaryMutation = useMutation({
     mutationFn: () => updateBookSummary(id!, editingSummaryText),
     onSuccess: () => {
@@ -85,6 +115,7 @@ const BookDetail = () => {
     onError: (e) => toast({ title: "Error updating summary", description: e.message, variant: "destructive" })
   });
 
+  // Save edited key lessons
   const lessonsMutation = useMutation({
     mutationFn: () => updateBookKeyLearnings(id!, editingLessonsData),
     onSuccess: () => {
@@ -95,6 +126,7 @@ const BookDetail = () => {
     onError: (e) => toast({ title: "Error updating lessons", description: e.message, variant: "destructive" })
   });
 
+  // Regenerate the AI summary (replaces current summary and lessons)
   const regenerateMutation = useMutation({
     mutationFn: () => regenerateBookSummary(id!, book!.title, book!.author),
     onSuccess: () => {
@@ -104,22 +136,26 @@ const BookDetail = () => {
     onError: (e) => toast({ title: "Error regenerating summary", description: e.message, variant: "destructive" })
   });
 
-  // --- Helpers for editing lessons ---
+  // ── Helpers for editing lessons ──
 
+  // Update a single field (title or detail) of a lesson at a given index
   const updateLesson = (index: number, field: keyof KeyLesson, value: string) => {
     setEditingLessonsData((prev) => prev.map((l, i) => i === index ? { ...l, [field]: value } : l));
   };
 
+  // Remove a lesson at a given index
   const removeLesson = (index: number) => {
     setEditingLessonsData((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Add a new empty lesson at the end
   const addLesson = () => {
     setEditingLessonsData((prev) => [...prev, { title: "", detail: "" }]);
   };
 
-  // --- Render ---
+  // ── Render ──
 
+  // Show loading spinner while fetching
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -128,6 +164,7 @@ const BookDetail = () => {
 
   }
 
+  // Show "not found" if the book doesn't exist
   if (!book) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4">
@@ -139,12 +176,13 @@ const BookDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      {/* Header with back button and delete button */}
       <header className="px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-lg md:max-w-3xl lg:max-w-4xl items-center justify-between">
           <Link to="/" className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary">
             <ArrowLeft className="h-5 w-5" />
           </Link>
+          {/* Delete button with confirmation dialog */}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive">
@@ -173,7 +211,7 @@ const BookDetail = () => {
       </header>
 
       <main className="mx-auto max-w-lg md:max-w-3xl lg:max-w-4xl px-4 pb-16 pt-4 sm:px-6">
-        {/* Cover + Title */}
+        {/* Cover image + Title + Author */}
         <div className="mb-10 flex flex-col items-center md:flex-row md:items-start md:gap-8">
           {(() => {
             const coverUrl = getCoverUrl(book.cover_id, "L");
@@ -189,9 +227,10 @@ const BookDetail = () => {
           </div>
         </div>
 
+        {/* Content: either the summary sections or a loading state */}
         {book.summary ?
         <div className="space-y-10">
-            {/* AI Disclaimer */}
+            {/* AI Disclaimer — lets users know the summary is AI-generated */}
             <Alert className="border-muted bg-muted/40">
               <Info className="h-4 w-4 text-muted-foreground" />
               <AlertDescription className="text-xs text-muted-foreground">
@@ -199,11 +238,12 @@ const BookDetail = () => {
               </AlertDescription>
             </Alert>
 
-            {/* Summary */}
+            {/* ── Summary Section ── */}
             <section>
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-xl font-sans">Summary</h2>
                 <div className="flex items-center gap-1">
+                  {/* Edit button — switches to textarea mode */}
                   {!editingSummary &&
                 <Button
                   variant="ghost"
@@ -212,10 +252,10 @@ const BookDetail = () => {
                     setEditingSummaryText(book.summary || "");
                     setEditingSummary(true);
                   }}>
-
                       Edit
                     </Button>
                 }
+                  {/* Regenerate button — replaces summary with new AI version */}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
@@ -223,10 +263,8 @@ const BookDetail = () => {
                       size="sm"
                       className="gap-1.5"
                       disabled={regenerateMutation.isPending}>
-
                         {regenerateMutation.isPending ?
                       <Loader2 className="h-3.5 w-3.5 animate-spin" /> :
-
                       <RefreshCw className="h-3.5 w-3.5" />
                       }
                         Regenerate
@@ -250,13 +288,13 @@ const BookDetail = () => {
                 </div>
               </div>
 
+              {/* Summary content — either edit mode (textarea) or display mode */}
               {editingSummary ?
             <div className="space-y-3">
                   <Textarea
                 value={editingSummaryText}
                 onChange={(e) => setEditingSummaryText(e.target.value)}
                 className="min-h-[180px] resize-y rounded-xl text-sm" />
-
                   <div className="flex gap-2">
                     <Button size="sm" onClick={() => summaryMutation.mutate()} disabled={summaryMutation.isPending} className="gap-1.5">
                       {summaryMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
@@ -267,12 +305,11 @@ const BookDetail = () => {
                     </Button>
                   </div>
                 </div> :
-
             <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{book.summary}</p>
             }
             </section>
 
-            {/* Key Lessons */}
+            {/* ── Key Takeaways Section ── */}
             {book.key_learnings.length > 0 &&
           <section>
                 <div className="mb-3 flex items-center justify-between">
@@ -282,20 +319,22 @@ const BookDetail = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => {
+                  // Copy lessons into local state for editing
                   setEditingLessonsData(book.key_learnings.map((l) => ({ ...l })));
                   setEditingLessons(true);
                 }}>
-
                       Edit
                     </Button>
               }
                 </div>
 
+                {/* Key lessons — either edit mode (form) or display mode (accordion) */}
                 {editingLessons ?
             <div className="space-y-4">
                     {editingLessonsData.map((lesson, i) =>
               <div key={i} className="rounded-xl border p-4 space-y-2">
                         <div className="flex items-center gap-2">
+                          {/* Lesson number badge */}
                           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-medium text-accent">
                             {i + 1}
                           </span>
@@ -304,7 +343,7 @@ const BookDetail = () => {
                     onChange={(e) => updateLesson(i, "title", e.target.value)}
                     placeholder="Lesson title"
                     className="flex-1 text-sm" />
-
+                          {/* Remove lesson button */}
                           <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => removeLesson(i)}>
                             <X className="h-4 w-4" />
                           </Button>
@@ -314,7 +353,6 @@ const BookDetail = () => {
                   onChange={(e) => updateLesson(i, "detail", e.target.value)}
                   placeholder="Lesson detail"
                   className="min-h-[80px] resize-y text-sm" />
-
                       </div>
               )}
                     <Button variant="outline" size="sm" className="gap-1.5" onClick={addLesson}>
@@ -352,7 +390,7 @@ const BookDetail = () => {
               </section>
           }
 
-            {/* Personal Notes */}
+            {/* ── Personal Notes Section ── */}
             <section>
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="flex items-center gap-2 text-xl font-sans">
@@ -365,6 +403,7 @@ const BookDetail = () => {
                   </Button>
               }
               </div>
+              {/* Notes — edit mode, display mode, or empty state */}
               {editing ?
             <div className="space-y-3">
                   <Textarea
@@ -372,7 +411,6 @@ const BookDetail = () => {
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Write your personal notes, reflections, and key takeaways here…"
                 className="min-h-[140px] resize-y rounded-xl text-sm" />
-
                   <div className="flex gap-2">
                     <Button size="sm" onClick={() => notesMutation.mutate()} disabled={notesMutation.isPending} className="gap-1.5">
                       {notesMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
@@ -385,11 +423,9 @@ const BookDetail = () => {
                 </div> :
             notes ?
             <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{notes}</p> :
-
             <button
               onClick={() => setEditing(true)}
               className="w-full rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground/70 transition-colors hover:border-accent/50 hover:text-muted-foreground">
-
                   Click to add your personal notes…
                 </button>
             }

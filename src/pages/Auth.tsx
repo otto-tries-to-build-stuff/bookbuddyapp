@@ -1,3 +1,18 @@
+/**
+ * Auth.tsx — Sign In / Sign Up Page
+ *
+ * This is the login/registration page. It has three views:
+ * 1. Main view: Tabs for "Sign In" and "Sign Up" forms
+ * 2. Verification view: Shown after signup to tell the user to check their email
+ * 3. Forgot password view: Form to request a password reset link
+ *
+ * Key concepts:
+ * - Navigate: React Router component that redirects (used when already logged in)
+ * - Tabs: A UI pattern that switches between sign in and sign up forms
+ * - Conditional rendering: The component shows different views based on state
+ *   (showVerification, showForgot, or the default login/signup tabs)
+ */
+
 import { useState } from "react";
 import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,15 +27,18 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import homescreenBook from "@/assets/homescreen-book.png";
 
 export default function AuthPage() {
+  // Get auth state and functions from our custom hook
   const { session, loading, signIn, signUp, resetPassword } = useAuth();
   const { toast } = useToast();
 
+  // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [showVerification, setShowVerification] = useState(false);
-  const [showForgot, setShowForgot] = useState(false);
+  const [busy, setBusy] = useState(false);            // Loading state for form submission
+  const [showVerification, setShowVerification] = useState(false); // Show "check your email" view
+  const [showForgot, setShowForgot] = useState(false);             // Show forgot password form
 
+  // Show loading spinner while checking auth status
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -29,8 +47,11 @@ export default function AuthPage() {
     );
   }
 
+  // If already logged in, redirect to home page
   if (session) return <Navigate to="/" replace />;
 
+  // ── View 1: Email Verification Confirmation ──
+  // Shown after successful signup to tell the user to check their email
   if (showVerification) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -60,6 +81,7 @@ export default function AuthPage() {
     );
   }
 
+  // ── View 2: Forgot Password Form ──
   if (showForgot) {
     const handleReset = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -107,14 +129,18 @@ export default function AuthPage() {
     );
   }
 
+  // ── Handlers for the main sign in / sign up forms ──
+
   const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault();   // Prevent the form from reloading the page
     setBusy(true);
     const { error } = await signIn(email, password);
     setBusy(false);
     if (error) {
       toast({ title: "Sign in failed", description: error.message, variant: "destructive" });
     }
+    // If successful, the auth state change listener in useAuth will update the session,
+    // which triggers the redirect to "/" above
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -129,27 +155,32 @@ export default function AuthPage() {
     if (error) {
       toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
     } else if (needsVerification) {
-      setShowVerification(true);
+      setShowVerification(true); // Show the "check your email" view
     }
   };
 
+  // ── View 3: Main Sign In / Sign Up Tabs ──
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
+      {/* App logo/illustration */}
       <div className="mb-6 h-48 w-48">
         <img src="/lovable-uploads/56195569-8c38-43f8-bec7-173d30014769.png" alt="Book" className="h-full w-full object-contain" />
       </div>
+
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">BookBuddy</CardTitle>
           <CardDescription>Your AI-powered reading companion</CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Tabs switch between Sign In and Sign Up forms */}
           <Tabs defaultValue="signin">
             <TabsList className="mb-4 w-full">
               <TabsTrigger value="signin" className="flex-1">Sign In</TabsTrigger>
               <TabsTrigger value="signup" className="flex-1">Sign Up</TabsTrigger>
             </TabsList>
 
+            {/* Sign In form */}
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
@@ -170,6 +201,7 @@ export default function AuthPage() {
               </form>
             </TabsContent>
 
+            {/* Sign Up form */}
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
@@ -189,6 +221,8 @@ export default function AuthPage() {
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* Link to the About page */}
       <div className="mt-6">
         <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
           About BookBuddy
