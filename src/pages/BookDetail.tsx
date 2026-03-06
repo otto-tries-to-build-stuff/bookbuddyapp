@@ -217,6 +217,7 @@ const BookDetail = () => {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          </div>
         </div>
       </header>
 

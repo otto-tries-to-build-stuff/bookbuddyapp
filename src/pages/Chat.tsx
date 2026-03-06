@@ -90,6 +90,17 @@ const Chat = () => {
 
   const activeChat = chats.find((c) => c.id === activeChatId);
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Auto-select book from query parameter (e.g. coming from book detail page)
+  useEffect(() => {
+    const bookId = searchParams.get("bookId");
+    if (bookId) {
+      setSelectedBookIds((prev) => prev.includes(bookId) ? prev : [...prev, bookId]);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
   // Load messages when the active chat changes
   useEffect(() => {
     if (!activeChatId) {
