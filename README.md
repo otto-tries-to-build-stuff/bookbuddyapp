@@ -1,73 +1,80 @@
-# Welcome to your Lovable project
+# 📚 BookBuddy
 
-## Project info
+**Stop forgetting what you've learnt.**
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+BookBuddy is an AI-powered personal book library and reading companion. Add books you've read, get AI-generated summaries and key learnings, and chat with an AI assistant that knows your entire library.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## ✨ Features
 
-**Use Lovable**
+- **Personal Book Library** — Search and add books via the Open Library API. Your library is saved to the cloud and accessible from any device.
+- **AI-Generated Summaries** — Get concise summaries of each book, powered by AI.
+- **Key Learnings** — Extract and review the most important lessons from every book.
+- **Chat With Your Books** — Ask questions, compare ideas across books, and deepen your understanding with an AI assistant that has full context of your library.
+- **Chat History** — Conversations are saved automatically with auto-generated titles. Pin important chats or archive old ones.
+- **User Profiles** — Sign up, log in, upload an avatar, and manage your account.
+- **Dark / Light Mode** — Toggle between themes to suit your preference.
+- **Library Filtering** — Filter your library by title or author to quickly find what you need.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🛠 Tech Stack
 
-**Use your preferred IDE**
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | React, TypeScript, Vite |
+| **Styling** | Tailwind CSS, shadcn/ui |
+| **Routing** | React Router |
+| **Data Fetching** | TanStack React Query |
+| **Backend** | Lovable Cloud (database, auth, storage, edge functions) |
+| **AI** | Lovable AI (Google Gemini) via edge functions |
+| **Book Data** | Open Library API |
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 📁 Project Structure
 
-Follow these steps:
+```
+src/
+├── pages/           # Route-level page components (Index, Chat, BookDetail, Auth, etc.)
+├── components/      # Reusable components (BookSearchInput, ChatSidebar, NavLink, etc.)
+│   └── ui/          # shadcn/ui component library (button, dialog, card, etc.)
+├── hooks/           # Custom React hooks (useAuth, useDebounce, etc.)
+├── lib/             # Utility functions and API helpers (api.ts, openLibrary.ts)
+├── integrations/    # Auto-generated backend client and types
+└── assets/          # Images and static assets
+
+supabase/
+└── functions/       # Edge functions (chat, generate-book-summary, generate-chat-title)
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- [Node.js & npm](https://github.com/nvm-sh/nvm#installing-and-updating)
+
+### Local Development
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Navigate to the project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
+# Install dependencies
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📄 License
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+This project was built with [Lovable](https://lovable.dev).
