@@ -36,8 +36,10 @@ serve(async (req) => {
 
     // Instructions for the AI — what kind of summary we want
     const systemPrompt = `You are a book expert. For the book "${title}" by ${author}, provide:
-1. A concise summary (2-3 paragraphs)
+1. A concise summary (2-3 paragraphs). 
 2. A comprehensive list of key lessons from the book. You MUST provide at least 8-12 key lessons for most books, and more for particularly rich or complex works. Do NOT limit yourself to 5. Each lesson has a short title and 1-2 paragraphs of supporting detail that explains the lesson in depth. Cover the full breadth of the book's ideas.
+
+For fictional books only, do not include any spoilers.
 
 Do not use any markdown formatting (no asterisks, bold, italics, etc.) in your response.
 Only respond with the JSON via the tool call, no other text.`;
