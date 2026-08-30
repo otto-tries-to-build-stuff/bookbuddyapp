@@ -132,10 +132,12 @@ const Chat = () => {
     }
   }, [activeChatId, chats]);
 
-  // Auto-scroll to bottom when new messages appear
+  // Auto-scroll to bottom when new messages appear.
+  // "auto" (instant) while streaming so scroll keeps up with the typewriter;
+  // "smooth" for normal loads (e.g. opening an old chat).
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    scrollRef.current?.scrollIntoView({ behavior: isLoading ? "auto" : "smooth" });
+  }, [messages, isLoading]);
 
   // Toggle a book's selection (add/remove from context)
   const toggleBook = (id: string) => {
