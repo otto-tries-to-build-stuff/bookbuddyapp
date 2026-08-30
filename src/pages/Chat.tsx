@@ -200,21 +200,39 @@ const Chat = () => {
     // Save the user's message to the database
     await saveChatMessage(chatId, "user", text);
 
-    // Track the AI's response as it streams in
-    let assistantSoFar = "";
-    const upsert = (chunk: string) => {
-      assistantSoFar += chunk;
-      // Update the messages array with the growing response
+    // ── Typewriter streaming ──
+    // Chunks arrive from the network in irregular bursts. Instead of showing
+    // each burst immediately (which looks jumpy), we:
+    //   1. Buffer incoming chunks in pendingRef (via onDelta)
+    //   2. Reveal them character-by-character on a steady timer (the interval below)
+    // This makes the text appear at a smooth, consistent typing pace.
+    pendingRef.current = "";
+    fullRef.current = "";
+
+    // Reveal one tick's worth of characters from the buffer into the UI
+    const revealTick = () => {
+      const pending = pendingRef.current;
+      if (!pending) return;
+      // Adaptive speed: the bigger the backlog, the more we reveal per tick,
+      // so long responses don't lag far behind the stream.
+      const charsThisTick = Math.max(2, Math.ceil(pending.length / 10));
+      const revealed = pending.slice(0, charsThisTick);
+      pendingRef.current = pending.slice(charsThisTick);
       setMessages((prev) => {
         const last = prev[prev.length - 1];
         if (last?.role === "assistant") {
-          // Update existing assistant message
-          return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: assistantSoFar } : m);
+          // Append to the existing assistant message
+          return prev.map((m, i) =>
+            i === prev.length - 1 ? { ...m, content: m.content + revealed } : m
+          );
         }
-        // Create new assistant message
-        return [...prev, { role: "assistant", content: assistantSoFar }];
+        // Create the assistant message on the first tick
+        return [...prev, { role: "assistant", content: revealed }];
       });
     };
+
+    // Runs ~33 times per second for a fluid typing animation
+    timerRef.current = setInterval(revealTick, 30);
 
     const finalChatId = chatId;
     try {
@@ -222,12 +240,36 @@ const Chat = () => {
       await streamChat({
         messages: allMessages,
         bookIds: selectedBookIds.length > 0 ? selectedBookIds : undefined,
-        onDelta: upsert,  // Called for each chunk of text
+        // Called for each network chunk — just add it to the buffer and the
+        // full text record; the timer handles actually displaying it.
+        onDelta: (chunk: string) => {
+          pendingRef.current += chunk;
+          fullRef.current += chunk;
+        },
         onDone: async () => {
+          // Stream finished: stop the timer and flush anything left in the
+          // buffer so no text is lost, then save the complete response.
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
+          if (pendingRef.current) {
+            const rest = pendingRef.current;
+            pendingRef.current = "";
+            setMessages((prev) => {
+              const last = prev[prev.length - 1];
+              if (last?.role === "assistant") {
+                return prev.map((m, i) =>
+                  i === prev.length - 1 ? { ...m, content: m.content + rest } : m
+                );
+              }
+              return [...prev, { role: "assistant", content: rest }];
+            });
+          }
           setIsLoading(false);
           // Save the complete AI response to the database
-          if (assistantSoFar) {
-            await saveChatMessage(finalChatId, "assistant", assistantSoFar);
+          if (fullRef.current) {
+            await saveChatMessage(finalChatId, "assistant", fullRef.current);
           }
           // Auto-generate a title from the first user message
           if (allMessages.filter((m) => m.role === "user").length === 1) {
@@ -239,6 +281,11 @@ const Chat = () => {
       });
     } catch (e: any) {
       console.error(e);
+      // On error, stop the typewriter and flush the buffer
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
       setIsLoading(false);
       toast({ title: "Error", description: e.message, variant: "destructive" });
     }
