@@ -77,6 +77,20 @@ const Chat = () => {
   // Ref for auto-scrolling to the latest message
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // ── Typewriter effect refs ──
+  // pendingRef holds streamed text that hasn't been revealed on screen yet.
+  // fullRef holds the COMPLETE response (buffer + revealed) so we can save it.
+  const pendingRef = useRef("");
+  const fullRef = useRef("");
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Clean up the typewriter timer if the user leaves the page mid-stream
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
   // Fetch books (for the book selector) and chats (for the sidebar)
   const { data: books = [], isLoading: booksLoading } = useQuery({
     queryKey: ["books"],
