@@ -72,6 +72,8 @@ const Chat = () => {
   const [messages, setMessages] = useState<Msg[]>([]);       // Messages in the current chat
   const [input, setInput] = useState("");                     // Text in the input box
   const [isLoading, setIsLoading] = useState(false);          // Whether the AI is responding
+  const [isSearching, setIsSearching] = useState(false);      // Whether the AI is searching the web
+
   const [selectedBookIds, setSelectedBookIds] = useState<string[]>([]); // Books for context
 
   // Ref for auto-scrolling to the latest message
@@ -181,6 +183,8 @@ const Chat = () => {
     setMessages(allMessages);
     setInput("");
     setIsLoading(true);
+    setIsSearching(false);
+
 
     // Create a new chat conversation if this is the first message
     let chatId = activeChatId;
@@ -242,7 +246,10 @@ const Chat = () => {
         bookIds: selectedBookIds.length > 0 ? selectedBookIds : undefined,
         // Called for each network chunk — just add it to the buffer and the
         // full text record; the timer handles actually displaying it.
+        // Called when the AI starts a web search — show a small hint
+        onSearch: () => setIsSearching(true),
         onDelta: (chunk: string) => {
+
           pendingRef.current += chunk;
           fullRef.current += chunk;
         },
@@ -267,7 +274,9 @@ const Chat = () => {
             });
           }
           setIsLoading(false);
+          setIsSearching(false);
           // Save the complete AI response to the database
+
           if (fullRef.current) {
             await saveChatMessage(finalChatId, "assistant", fullRef.current);
           }
@@ -287,7 +296,9 @@ const Chat = () => {
         timerRef.current = null;
       }
       setIsLoading(false);
+      setIsSearching(false);
       toast({ title: "Error", description: e.message, variant: "destructive" });
+
     }
   };
 
@@ -458,11 +469,13 @@ const Chat = () => {
               {/* Loading indicator while waiting for AI to start responding */}
               {isLoading && messages[messages.length - 1]?.role !== "assistant" &&
               <div className="flex justify-start">
-                  <div className="rounded-2xl bg-secondary px-4 py-3">
+                  <div className="rounded-2xl bg-secondary px-4 py-3 flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    {isSearching && <span className="text-xs text-muted-foreground">Searching the web…</span>}
                   </div>
                 </div>
               }
+
             </div>
             {/* Invisible div at the bottom — scrollIntoView targets this */}
             <div ref={scrollRef} />
