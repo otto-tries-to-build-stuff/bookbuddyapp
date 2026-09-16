@@ -183,6 +183,8 @@ const Chat = () => {
     setMessages(allMessages);
     setInput("");
     setIsLoading(true);
+    setIsSearching(false);
+
 
     // Create a new chat conversation if this is the first message
     let chatId = activeChatId;
@@ -463,11 +465,13 @@ const Chat = () => {
               {/* Loading indicator while waiting for AI to start responding */}
               {isLoading && messages[messages.length - 1]?.role !== "assistant" &&
               <div className="flex justify-start">
-                  <div className="rounded-2xl bg-secondary px-4 py-3">
+                  <div className="rounded-2xl bg-secondary px-4 py-3 flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    {isSearching && <span className="text-xs text-muted-foreground">Searching the web…</span>}
                   </div>
                 </div>
               }
+
             </div>
             {/* Invisible div at the bottom — scrollIntoView targets this */}
             <div ref={scrollRef} />
