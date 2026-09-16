@@ -72,6 +72,8 @@ const Chat = () => {
   const [messages, setMessages] = useState<Msg[]>([]);       // Messages in the current chat
   const [input, setInput] = useState("");                     // Text in the input box
   const [isLoading, setIsLoading] = useState(false);          // Whether the AI is responding
+  const [isSearching, setIsSearching] = useState(false);      // Whether the AI is searching the web
+
   const [selectedBookIds, setSelectedBookIds] = useState<string[]>([]); // Books for context
 
   // Ref for auto-scrolling to the latest message
@@ -242,7 +244,10 @@ const Chat = () => {
         bookIds: selectedBookIds.length > 0 ? selectedBookIds : undefined,
         // Called for each network chunk — just add it to the buffer and the
         // full text record; the timer handles actually displaying it.
+        // Called when the AI starts a web search — show a small hint
+        onSearch: () => setIsSearching(true),
         onDelta: (chunk: string) => {
+
           pendingRef.current += chunk;
           fullRef.current += chunk;
         },
