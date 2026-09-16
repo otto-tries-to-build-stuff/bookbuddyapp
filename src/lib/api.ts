@@ -459,19 +459,28 @@ type Msg = { role: "user" | "assistant"; content: string };
  * @param messages - The conversation history to send to the AI
  * @param bookIds - Which books to use as context for the AI
  * @param onDelta - Called with each new chunk of text as it arrives
+ * @param onSearch - Called when the AI starts a web search (to show a hint in the UI)
  * @param onDone - Called when the AI finishes its response
  */
 export async function streamChat({
   messages,
   bookIds,
   onDelta,
+  onSearch,
   onDone,
 }: {
   messages: Msg[];
   bookIds?: string[];
   onDelta: (text: string) => void;
+  onSearch?: () => void;
   onDone: () => void;
 }) {
+  // Get the signed-in user's session token. Sending THIS token (instead of
+  // the public app key) lets the edge function verify who is asking, so it
+  // can only ever load that person's books.
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("Not signed in");
+
   // Make a POST request to our chat edge function
   const resp = await fetch(
     `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`,
@@ -479,11 +488,12 @@ export async function streamChat({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        Authorization: `Bearer ${session.access_token}`,
       },
       body: JSON.stringify({ messages, bookIds }),
     }
   );
+
 
   if (!resp.ok) {
     const err = await resp.json().catch(() => ({}));
@@ -523,16 +533,34 @@ export async function streamChat({
       if (jsonStr === "[DONE]") { streamDone = true; break; }  // AI finished
 
       try {
-        // Parse the SSE event and extract the text content
+        // Parse the SSE event. The AI now streams "Responses API" events:
+        // - "response.output_text.delta" carries the next bit of answer text
+        // - "response.web_search_call.in_progress" means it's searching the web
+        // - "response.completed" means the answer is finished
         const parsed = JSON.parse(jsonStr);
-        const content = parsed.choices?.[0]?.delta?.content;
-        if (content) onDelta(content);  // Send the new text to the UI
+        if (parsed.type === "response.output_text.delta") {
+          if (parsed.delta) onDelta(parsed.delta);  // Send the new text to the UI
+        } else if (
+          parsed.type === "response.web_search_call.in_progress" ||
+          parsed.type === "response.web_search_call.started"
+        ) {
+          onSearch?.();  // Tell the UI a web search has started
+        } else if (
+          parsed.type === "response.completed" ||
+          parsed.type === "response.failed" ||
+          parsed.type === "response.error" ||
+          parsed.type === "error"
+        ) {
+          streamDone = true;
+          break;
+        }
       } catch {
         // If JSON parsing fails, put the line back in the buffer
         // (it might be a partial line that needs more data)
         buffer = line + "\n" + buffer;
         break;
       }
+
     }
   }
 
