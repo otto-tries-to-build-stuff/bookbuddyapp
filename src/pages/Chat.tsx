@@ -274,7 +274,9 @@ const Chat = () => {
             });
           }
           setIsLoading(false);
+          setIsSearching(false);
           // Save the complete AI response to the database
+
           if (fullRef.current) {
             await saveChatMessage(finalChatId, "assistant", fullRef.current);
           }
@@ -294,7 +296,9 @@ const Chat = () => {
         timerRef.current = null;
       }
       setIsLoading(false);
+      setIsSearching(false);
       toast({ title: "Error", description: e.message, variant: "destructive" });
+
     }
   };
 
